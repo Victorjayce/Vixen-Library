@@ -12,11 +12,14 @@ class ContainerTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
+      padding: EdgeInsets.all(10.0),
+      color: Colors.transparent,
+      child: Container(
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.blue,
         borderRadius: BorderRadius.circular(8),
       ),
-      margin: const EdgeInsets.all(10.0),
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 6,
@@ -32,6 +35,7 @@ class ContainerTitle extends StatelessWidget {
           color: Colors.white,
         ),
       ),
+    ),
     );
   }
 }

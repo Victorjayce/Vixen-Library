@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:library_mgt/widgets/addbook.dart';
 import 'widgets/containertitle.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,7 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
+  bool showAddbook = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
         icon: Icon(Icons.menu),
         color: Colors.blue,
         iconSize: 40,
-        onPressed: () => Scaffold.of(context).openEndDrawer(),
+        onPressed: () => _opendrawer(context),
       ),
     ),
   ],
@@ -92,7 +93,10 @@ class _HomePageState extends State<HomePage> {
       ],
     ),
   ),
-      body: Column(
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Row(
@@ -144,8 +148,30 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+          Visibility(
+            visible: showAddbook,
+            maintainState: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Addbook(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () => _addbooks(), 
+                    icon: Icon(Icons.close, color: Colors.red, size: 50,), tooltip: 'Cancel',),
+                    IconButton(onPressed: null, 
+                    icon: Icon(Icons.check, color: Colors.blue, size: 50,), tooltip: 'Save Book',),
+                  ],
+                )
+              ],
+            )
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: () => _addbooks(),
         tooltip: 'Add Books',
         child: Icon(
           Icons.library_add,
@@ -154,5 +180,23 @@ class _HomePageState extends State<HomePage> {
           ),
       ),
     );
+  }
+
+  _addbooks(){
+    setState(() {
+      if (!showAddbook) {
+        showAddbook = true;
+      }
+      else{
+        showAddbook = false;
+      }
+    });
+  }
+
+  _opendrawer(BuildContext context){
+    if(showAddbook) {return;}
+    else{
+      Scaffold.of(context).openEndDrawer();
+    }
   }
 }

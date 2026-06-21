@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:library_mgt/widgets/containertitle.dart';
 //import 'package:library_mgt/lib.dart';
+import 'dart:ui' as ui;
 
 class Addbook extends StatefulWidget {
   const Addbook({super.key});
@@ -13,8 +14,15 @@ class Addbook extends StatefulWidget {
 class _AddbookState extends State<Addbook> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 10.0,
+    return BackdropFilter(
+    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),   // blur intensity
+    child: Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.3),   // semi-transparent tint over the blur = "glass" look
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+      ),
       child: Padding(
         padding:EdgeInsets.all(10.0),
         child: Column(
@@ -73,6 +81,7 @@ class _AddbookState extends State<Addbook> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

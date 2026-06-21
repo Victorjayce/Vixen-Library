@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => TestWidg(),
+        '/': (context) => HomePage(),
         '/authorscreen': (context) => AuthorPage(),
         '/borrowedscreen': (context) => BorrowedPage(),
         '/authordetail': (context) => AuthorDetailPage(),

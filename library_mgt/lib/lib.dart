@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 
 class Book {
   final int id;
@@ -12,44 +13,40 @@ class Book {
     required this.author,
     required this.available,
   });
-
-  //@override
-  //String toString() => 'ID: $id | Title: $title | Author: $author | Available: $available';
 }
 
-class Author{
+class Author {
   final int id;
   final String name;
   final List<int> booksId;
-  Author({
-    required this.id,
-    required this.name,
-    required this.booksId,
-  });
+
+  Author({required this.id, required this.name, required this.booksId});
 }
 
-class Library {
+class Library extends ChangeNotifier {
   final List<Book> _books = [
-  Book(id: 1, title: 'The Hobbit', author: 'J.R.R. Tolkien', available: 5),
-  Book(id: 2, title: '1984', author: 'George Orwell', available: 5),
-  Book(id: 3, title: 'Dune', author: 'Frank Herbert', available: 5),
-  Book(id: 4, title: 'Subtle Art', author: 'Victor Jayc3', available: 5),
-  Book(id: 5, title: 'Crucial Convo', author: 'Victor Jayc3', available: 5),
-  Book(id: 6, title: 'The Hobbit2', author: 'J.R.R. Tolkien', available: 5),
-  Book(id: 7, title: '1985', author: 'George Orwell', available: 5),
+    Book(id: 1, title: 'The Hobbit', author: 'J.R.R. Tolkien', available: 5),
+    Book(id: 2, title: '1984', author: 'George Orwell', available: 5),
+    Book(id: 3, title: 'Dune', author: 'Frank Herbert', available: 5),
+    Book(id: 4, title: 'Subtle Art', author: 'Victor Jayc3', available: 5),
+    Book(id: 5, title: 'Crucial Convo', author: 'Victor Jayc3', available: 5),
+    Book(id: 6, title: 'The Hobbit2', author: 'J.R.R. Tolkien', available: 5),
+    Book(id: 7, title: '1985', author: 'George Orwell', available: 5),
   ];
-
-  
 
   final List<Author> _authors = [
     Author(id: 1, name: 'J.R.R. Tolkien', booksId: [1, 6]),
     Author(id: 2, name: 'George Orwell', booksId: [2, 7]),
     Author(id: 3, name: 'Victor Jayc3', booksId: [4, 5]),
-    Author(id: 4, name: 'Frank Herbert', booksId: [3])
+    Author(id: 4, name: 'Frank Herbert', booksId: [3]),
   ];
 
-  void addBook(String title, String author, int quantity) {
+  List<Book> get books => List.unmodifiable(_books);
+  List<Author> get authors => List.unmodifiable(_authors);
+  List<String> get authorNames =>
+      _authors.map((author) => author.name).toList();
 
+  void addBook(String title, String author, int quantity) {
     final newBook = Book(
       id: _books.length + 1,
       title: title,
@@ -58,40 +55,53 @@ class Library {
     );
 
     _books.add(newBook);
+    notifyListeners();
   }
 
   String borrowBook(int bookId, int amount) {
     if (_books.isEmpty) {
-      return 'No Books available';
+      return 'No books available.';
     }
-    var displayMsg = '';
-    
-    final book = _books.cast<Book?>().firstWhere(
-      (b) => b?.id == bookId,
-      orElse: () => null,
+
+    final book = _books.firstWhere(
+      (b) => b.id == bookId,
+      orElse: () => throw StateError('Book not found'),
     );
 
-    if (book != null) {
-      if (book.available > amount) {
-        book.available -= amount;
-        book.borrowed += amount;
-      } else {
-        
-      }
-    } else {
-      displayMsg = 'Error: Book not found.';
+    if (book.available >= amount) {
+      book.available -= amount;
+      book.borrowed += amount;
+      notifyListeners();
+      return '';
     }
-    return displayMsg;
+
+    return 'Not enough copies available.';
   }
 
-
-  void addauthor(String name, List<int> booksId) {
-
-    final newauth = Author(
-      id: _authors.length = 1,
+  void addAuthor(String name, List<int> booksId) {
+    final newAuthor = Author(
+      id: _authors.length + 1,
       name: name,
       booksId: booksId,
     );
-    _authors.add(newauth);
+    _authors.add(newAuthor);
+    notifyListeners();
+  }
+}
+
+final library = Library();
+
+class LibraryProvider extends InheritedNotifier<Library> {
+  const LibraryProvider({
+    super.key,
+    required Library library,
+    required Widget child,
+  }) : super(notifier: library, child: child);
+
+  static Library of(BuildContext context) {
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<LibraryProvider>();
+    assert(provider != null, 'No LibraryProvider found in context.');
+    return provider!.notifier!;
   }
 }

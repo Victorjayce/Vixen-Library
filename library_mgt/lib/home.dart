@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:library_mgt/lib.dart';
+import 'package:library_mgt/widgets/actioncard.dart';
 import 'package:library_mgt/widgets/addbook.dart';
+import 'package:library_mgt/widgets/addmore.dart';
 import 'widgets/containertitle.dart';
 import 'dart:ui' as ui;
 
@@ -13,6 +15,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool showAddbook = false;
+  bool showAddmore = false;
+  bool showFab = false;
+  int addbookId = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -98,18 +103,39 @@ class _HomePageState extends State<HomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  const ContainerTitle(title: 'Books'),
-                  IconButton(
-                    icon: const Icon(Icons.bookmark_add),
-                    color: Colors.blue,
-                    iconSize: 40,
-                    tooltip: 'Borrow Books',
-                    onPressed: () {},
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    NavCard(icon: Icons.book, text: 'Books', onPage: true),
+                    const SizedBox(width: 12),
+                    InkWell(
+                      onTap: () => {
+                        Navigator.pushNamed(context, '/authorscreen'),
+                      },
+                      child: NavCard(
+                        icon: Icons.person,
+                        text: 'Authors',
+                        onPage: false,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    InkWell(
+                      onTap: () => {
+                        Navigator.pushNamed(context, '/borrowedscreen'),
+                      },
+                      child: NavCard(
+                        icon: Icons.bookmark_added,
+                        text: 'Borrowed',
+                        onPage: false,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Expanded(
                 child: library.books.isEmpty
@@ -119,79 +145,119 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(fontSize: 18),
                         ),
                       )
-                    : ListView.builder(
+                    : ListView.separated(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         itemCount: library.books.length,
                         itemBuilder: (context, index) {
                           final book = library.books[index];
                           return ListTile(
                             leading: const Icon(Icons.book),
-                            title: Text(book.title),
-                            subtitle: Text(
-                              '${book.author} · ${book.available} available',
+                            title: Text(
+                              book.title,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.normal,
+                                fontFamily: 'Roboto',
+                                letterSpacing: 0.5,
+                                color: Colors.blue,
+                              ),
+                            ),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('by ${book.author}'),
+                                Text(
+                                  '${book.available} pieces',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.normal,
+                                    fontFamily: 'Roboto',
+                                    letterSpacing: 0.5,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  onPressed: () => _addmore(book.id),
+                                  tooltip: 'Add more to Library',
+                                  icon: Icon(Icons.add_box, color: Colors.blue),
+                                  iconSize: 30,
+                                ),
+                                IconButton(
+                                  onPressed: null,
+                                  tooltip: 'Borrow this Book',
+                                  icon: Icon(
+                                    Icons.bookmark_add,
+                                    color: Colors.blue,
+                                  ),
+                                  iconSize: 30,
+                                ),
+                              ],
                             ),
                           );
                         },
+                        separatorBuilder: (context, index) => const Divider(
+                          indent: 16,
+                          endIndent: 16,
+                          thickness: 1,
+                        ),
                       ),
               ),
             ],
           ),
-          if (showAddbook)
-            IgnorePointer(
-              ignoring: !showAddbook,
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedScale(
-                  scale: showAddbook ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 24,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Addbook(),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                onPressed: () => _addbooks(),
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                  size: 50,
-                                ),
-                                tooltip: 'Cancel',
-                              ),
-                              SizedBox(width: 40),
-                              IconButton(
-                                onPressed: () => _addbooks(),
-                                icon: const Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                  size: 50,
-                                ),
-                                tooltip: 'Save',
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+          Visibility(
+            visible: showAddbook,
+            maintainState: true,
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: AnimatedScale(
+                scale: showAddbook ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                child: Addbook(
+                  onClose: () {
+                    setState(() {
+                      showAddbook = false;
+                      showFab = true;
+                    });
+                  },
                 ),
               ),
             ),
+          ),
+          Visibility(
+            visible: showAddmore,
+            maintainState: true,
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: AnimatedScale(
+                scale: showAddmore ? 1.0 : 0,
+                duration: Duration(milliseconds: 250),
+                child: AddMore(
+                  onClose: () {
+                    setState(() {
+                      showAddmore = false;
+                      showFab = true;
+                    });
+                  },
+                  bookId: addbookId,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButton: IgnorePointer(
-        ignoring: showAddbook,
+        ignoring: !showFab,
         child: AnimatedScale(
-          scale: !showAddbook ? 1.0 : 0.0,
+          scale: showFab ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: () => _addbooks(),
@@ -206,6 +272,15 @@ class _HomePageState extends State<HomePage> {
   void _addbooks() {
     setState(() {
       showAddbook = !showAddbook;
+      showFab = !showFab;
+    });
+  }
+
+  void _addmore(int id) {
+    addbookId = id;
+    setState(() {
+      showAddmore = !showAddmore;
+      showFab = !showFab;
     });
   }
 

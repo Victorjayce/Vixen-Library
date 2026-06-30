@@ -5,14 +5,14 @@ class Book {
   final String title;
   final String author;
   int available;
-  int borrowed = 0;
+  int rented = 0;
 
   Book({
     required this.id,
     required this.title,
     required this.author,
     required this.available,
-    this.borrowed = 0,
+    this.rented = 0,
   });
 }
 
@@ -38,21 +38,21 @@ class Library extends ChangeNotifier {
       title: 'The Hobbit',
       author: 'J.R.R. Tolkien',
       available: 5,
-      borrowed: 3,
+      rented: 3,
     ),
     Book(
       id: 2,
       title: '1984',
       author: 'George Orwell',
       available: 5,
-      borrowed: 3,
+      rented: 3,
     ),
     Book(
       id: 3,
       title: 'Dune',
       author: 'Frank Herbert',
       available: 5,
-      borrowed: 3,
+      rented: 3,
     ),
     Book(id: 4, title: 'Subtle Art', author: 'Victor Jayc3', available: 5),
     Book(id: 5, title: 'Crucial Convo', author: 'Victor Jayc3', available: 5),
@@ -61,7 +61,7 @@ class Library extends ChangeNotifier {
       title: 'The Hobbit2',
       author: 'J.R.R. Tolkien',
       available: 5,
-      borrowed: 3,
+      rented: 3,
     ),
     Book(id: 7, title: '1985', author: 'George Orwell', available: 5),
     Book(
@@ -69,126 +69,120 @@ class Library extends ChangeNotifier {
       title: 'Shadow Master',
       author: 'Guity Three',
       available: 20,
-      borrowed: 90,
+      rented: 90,
     ),
     Book(
       id: 9,
       title: 'Shadow Slave',
       author: 'Guity Three',
       available: 20,
-      borrowed: 90,
+      rented: 90,
     ),
     Book(
       id: 10,
       title: 'Sunless',
       author: 'Guity Three',
       available: 20,
-      borrowed: 90,
+      rented: 90,
     ),
     Book(
       id: 11,
       title: 'Flaming Sun',
       author: 'Guity Three',
       available: 20,
-      borrowed: 90,
+      rented: 90,
     ),
     Book(
       id: 12,
       title: 'Wraiths',
       author: 'Guity Three',
       available: 20,
-      borrowed: 90,
+      rented: 90,
     ),
     Book(
       id: 13,
       title: 'LOTM',
       author: 'Cuttlefish',
       available: 39,
-      borrowed: 34,
+      rented: 34,
     ),
     Book(
       id: 14,
       title: 'Kill the Sun',
       author: 'Prince Esper',
       available: 29,
-      borrowed: 12,
+      rented: 12,
     ),
     Book(
       id: 15,
       title: 'Mother of Learning',
       author: 'Novada Rain',
       available: 79,
-      borrowed: 23,
+      rented: 23,
     ),
     Book(
       id: 16,
       title: 'Young Master',
       author: 'Master Yeung',
       available: 28,
-      borrowed: 5,
+      rented: 5,
     ),
     Book(
       id: 17,
       title: 'City of Gold',
       author: 'Guity Three',
       available: 20,
-      borrowed: 90,
+      rented: 90,
     ),
-    Book(
-      id: 18,
-      title: 'COI',
-      author: 'Cuttlefish',
-      available: 39,
-      borrowed: 34,
-    ),
+    Book(id: 18, title: 'COI', author: 'Cuttlefish', available: 39, rented: 34),
     Book(
       id: 19,
       title: 'Nick the Specter',
       author: 'Prince Esper',
       available: 29,
-      borrowed: 12,
+      rented: 12,
     ),
     Book(
       id: 20,
       title: 'Home Magus',
       author: 'Novada Rain',
       available: 79,
-      borrowed: 23,
+      rented: 23,
     ),
     Book(
       id: 21,
       title: 'Young Master\'s POV',
       author: 'Master Yeung',
       available: 28,
-      borrowed: 5,
+      rented: 5,
     ),
     Book(
       id: 22,
       title: 'Great Old Ones',
       author: 'Cuttlefish',
       available: 39,
-      borrowed: 34,
+      rented: 34,
     ),
     Book(
       id: 23,
       title: 'The Fool',
       author: 'Cuttlefish',
       available: 39,
-      borrowed: 34,
+      rented: 34,
     ),
     Book(
       id: 24,
       title: 'Gehrman the Sparrow',
       author: 'Cuttlefish',
       available: 39,
-      borrowed: 34,
+      rented: 34,
     ),
     Book(
       id: 25,
       title: 'The Outer Lords',
       author: 'Prince Esper',
       available: 29,
-      borrowed: 12,
+      rented: 12,
     ),
   ];
 
@@ -210,6 +204,7 @@ class Library extends ChangeNotifier {
   List<String> get authorNames =>
       _authors.map((author) => author.name).toList();
   List<String> get bookNames => _books.map((book) => book.title).toList();
+  List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
 
   void addBook(String title, String author, int quantity) {
     final newBook = Book(
@@ -243,7 +238,7 @@ class Library extends ChangeNotifier {
     return _books.where((book) => ids.contains(book.id)).toList();
   }
 
-  void borrowBook(int bookId, int amount) {
+  void rentBook(int bookId, int amount) {
     if (_books.isEmpty) {
       return;
     }
@@ -255,7 +250,20 @@ class Library extends ChangeNotifier {
 
     if (book.available >= amount) {
       book.available -= amount;
-      book.borrowed += amount;
+      book.rented += amount;
+      notifyListeners();
+    }
+  }
+
+  void returnBook(int bookId, int amount) {
+    if (rented.isEmpty) return;
+    final book = _books.firstWhere(
+      (b) => b.id == bookId,
+      orElse: () => throw StateError('Book not found'),
+    );
+    if (book.rented >= amount) {
+      book.rented -= amount;
+      book.available += amount;
       notifyListeners();
     }
   }

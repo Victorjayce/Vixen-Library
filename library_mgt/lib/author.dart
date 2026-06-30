@@ -45,25 +45,29 @@ class _AuthorPageState extends State<AuthorPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    InkWell(
-                      onTap: () => {Navigator.pushNamed(context, '/')},
-                      child: NavCard(
-                        icon: Icons.book,
-                        text: 'Books',
-                        onPage: false,
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => {Navigator.pushNamed(context, '/')},
+                        child: NavCard(
+                          icon: Icons.book,
+                          text: 'Books',
+                          onPage: false,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     NavCard(icon: Icons.person, text: 'Authors', onPage: true),
                     const SizedBox(width: 12),
-                    InkWell(
-                      onTap: () => {
-                        Navigator.pushNamed(context, '/borrowedscreen'),
-                      },
-                      child: NavCard(
-                        icon: Icons.bookmark_added,
-                        text: 'Borrowed',
-                        onPage: false,
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => {
+                          Navigator.pushNamed(context, '/rentedscreen'),
+                        },
+                        child: NavCard(
+                          icon: Icons.bookmark_added,
+                          text: 'Rented',
+                          onPage: false,
+                        ),
                       ),
                     ),
                   ],

@@ -119,7 +119,9 @@ class _AddMoreState extends State<AddMore> {
     widget.onClose();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Pieces added to library'),
+        content: quantity == 1
+            ? Text('$quantity piece added to library')
+            : Text('$quantity Pieces added to library'),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.blue.withValues(alpha: 0.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:library_mgt/lib.dart';
 import 'containertitle.dart';
 
-class Borrow extends StatefulWidget {
-  const Borrow({
+class Rent extends StatefulWidget {
+  const Rent({
     super.key,
     required this.onClose,
     this.bookName = '',
@@ -14,10 +14,10 @@ class Borrow extends StatefulWidget {
   final int bookId;
 
   @override
-  State<Borrow> createState() => _BorrowState();
+  State<Rent> createState() => _RentState();
 }
 
-class _BorrowState extends State<Borrow> {
+class _RentState extends State<Rent> {
   int quantity = 1;
   String selectedBook = '';
   int bookId = 0;
@@ -40,6 +40,7 @@ class _BorrowState extends State<Borrow> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -67,7 +68,7 @@ class _BorrowState extends State<Borrow> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            ContainerTitle(title: 'Borrow Books'),
+                            ContainerTitle(title: 'Rent Books'),
                           ],
                         ),
                         Container(
@@ -167,7 +168,7 @@ class _BorrowState extends State<Borrow> {
                     ),
                     SizedBox(width: 40),
                     IconButton(
-                      onPressed: () => _borrow(context),
+                      onPressed: () => _rent(context),
                       icon: const Icon(
                         Icons.check,
                         color: Colors.green,
@@ -188,7 +189,8 @@ class _BorrowState extends State<Borrow> {
   void _increment(BuildContext context) {
     int available = LibraryProvider.of(
       context,
-    ).books.firstWhere((b) => b.id == bookId).id;
+    ).books.firstWhere((b) => b.id == bookId).available;
+    if (quantity == available) return;
     setState(() {
       quantity++;
       if (quantity > 1) showdecrement = true;
@@ -199,7 +201,7 @@ class _BorrowState extends State<Borrow> {
   void _decrement(BuildContext context) {
     int available = LibraryProvider.of(
       context,
-    ).books.firstWhere((b) => b.id == bookId).id;
+    ).books.firstWhere((b) => b.id == bookId).available;
     if (quantity <= 1) return;
 
     setState(() {
@@ -213,11 +215,11 @@ class _BorrowState extends State<Borrow> {
     });
   }
 
-  void _borrow(BuildContext context) {
+  void _rent(BuildContext context) {
     if (bookId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Select Book to borrow'),
+          content: Text('Select Book to rent'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -228,11 +230,13 @@ class _BorrowState extends State<Borrow> {
       );
       return;
     }
-    library.borrowBook(bookId, quantity);
-    widget.onClose;
+    library.rentBook(bookId, quantity);
+    widget.onClose();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$quantity borrowed from Library successfully'),
+        content: quantity == 1
+            ? Text('$quantity book rented from Library')
+            : Text('$quantity books rented from Library'),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.blue.withValues(alpha: 0.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

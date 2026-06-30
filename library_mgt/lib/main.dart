@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:library_mgt/author.dart';
-import 'package:library_mgt/borrowed.dart';
+import 'package:library_mgt/rented.dart';
 import 'package:library_mgt/details.dart';
 import 'package:library_mgt/lib.dart';
 import 'home.dart';
 
 const homeRoute = '/';
 const authorRoute = '/authorscreen';
-const borrowedRoute = '/borrowedscreen';
+const rentedRoute = '/rentedscreen';
 
 void main() {
   runApp(const MyApp());
@@ -36,8 +36,8 @@ Route<dynamic>? _routes(RouteSettings settings) {
   switch (settings.name) {
     case homeRoute:
       return MaterialPageRoute(builder: (_) => const HomePage());
-    case borrowedRoute:
-      return MaterialPageRoute(builder: (_) => const BorrowedPage());
+    case rentedRoute:
+      return MaterialPageRoute(builder: (_) => const RentedPage());
     case authorRoute:
       return MaterialPageRoute(builder: (_) => const AuthorPage());
     case '/authordetail':

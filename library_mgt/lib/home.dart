@@ -5,6 +5,7 @@ import 'package:library_mgt/widgets/addbook.dart';
 import 'package:library_mgt/widgets/addmore.dart';
 import 'widgets/containertitle.dart';
 import 'dart:ui' as ui;
+import 'widgets/rent.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +19,10 @@ class _HomePageState extends State<HomePage> {
   bool showAddmore = false;
   bool showFab = false;
   int addbookId = 0;
+
+  bool showrent = false;
+  String rentbookName = '';
+  int rentbookId = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +50,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.bookmark_add),
               title: const Text(
-                'Borrow Books',
+                'Rent Books',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -61,7 +66,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.bookmark_added),
               title: const Text(
-                'Borrowed Books',
+                'Rented Books',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -73,7 +78,7 @@ class _HomePageState extends State<HomePage> {
               ),
               iconColor: Colors.blue,
               onTap: () {
-                Navigator.pushNamed(context, '/borrowedscreen');
+                Navigator.pushNamed(context, '/rentedscreen');
               },
             ),
             ListTile(
@@ -105,33 +110,43 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: 8,
+                  vertical: 12,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    NavCard(icon: Icons.book, text: 'Books', onPage: true),
-                    const SizedBox(width: 12),
-                    InkWell(
-                      onTap: () => {
-                        Navigator.pushNamed(context, '/authorscreen'),
-                      },
+                    Expanded(
                       child: NavCard(
-                        icon: Icons.person,
-                        text: 'Authors',
-                        onPage: false,
+                        icon: Icons.book,
+                        text: 'Books',
+                        onPage: true,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    InkWell(
-                      onTap: () => {
-                        Navigator.pushNamed(context, '/borrowedscreen'),
-                      },
-                      child: NavCard(
-                        icon: Icons.bookmark_added,
-                        text: 'Borrowed',
-                        onPage: false,
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => {
+                          Navigator.pushNamed(context, '/authorscreen'),
+                        },
+                        child: NavCard(
+                          icon: Icons.person,
+                          text: 'Authors',
+                          onPage: false,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => {
+                          Navigator.pushNamed(context, '/rentedscreen'),
+                        },
+                        child: NavCard(
+                          icon: Icons.bookmark_added,
+                          text: 'Rented',
+                          onPage: false,
+                        ),
                       ),
                     ),
                   ],
@@ -151,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (context, index) {
                           final book = library.books[index];
                           return ListTile(
-                            leading: const Icon(Icons.book),
+                            leading: const Icon(Icons.book, color: Colors.blue),
                             title: Text(
                               book.title,
                               style: const TextStyle(
@@ -168,17 +183,29 @@ class _HomePageState extends State<HomePage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text('by ${book.author}'),
-                                Text(
-                                  '${book.available} pieces',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.normal,
-                                    fontFamily: 'Roboto',
-                                    letterSpacing: 0.5,
-                                    color: Colors.black,
-                                  ),
-                                ),
+                                book.available > 1
+                                    ? Text(
+                                        '${book.available} pieces',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.normal,
+                                          fontFamily: 'Roboto',
+                                          letterSpacing: 0.5,
+                                          color: Colors.black,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Unavailable',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.normal,
+                                          fontFamily: 'Roboto',
+                                          letterSpacing: 0.5,
+                                          color: Colors.black,
+                                        ),
+                                      ),
                               ],
                             ),
                             trailing: Row(
@@ -191,14 +218,20 @@ class _HomePageState extends State<HomePage> {
                                   icon: Icon(Icons.add_box, color: Colors.blue),
                                   iconSize: 30,
                                 ),
-                                IconButton(
-                                  onPressed: null,
-                                  tooltip: 'Borrow this Book',
-                                  icon: Icon(
-                                    Icons.bookmark_add,
-                                    color: Colors.blue,
+                                Visibility(
+                                  visible: book.available > 1,
+                                  maintainState: true,
+                                  child: IconButton(
+                                    onPressed: () => {
+                                      _callrent(book.title, book.id),
+                                    },
+                                    tooltip: 'Rent this Book',
+                                    icon: Icon(
+                                      Icons.bookmark_add,
+                                      color: Colors.blue,
+                                    ),
+                                    iconSize: 30,
                                   ),
-                                  iconSize: 30,
                                 ),
                               ],
                             ),
@@ -252,6 +285,25 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          Visibility(
+            visible: showrent,
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: AnimatedScale(
+                scale: showrent ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                child: Rent(
+                  onClose: () {
+                    setState(() {
+                      showrent = false;
+                    });
+                  },
+                  bookId: rentbookId,
+                  bookName: rentbookName,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButton: IgnorePointer(
@@ -289,5 +341,13 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     Scaffold.of(context).openEndDrawer();
+  }
+
+  void _callrent(String name, int id) {
+    setState(() {
+      rentbookId = id;
+      rentbookName = name;
+      showrent = true;
+    });
   }
 }

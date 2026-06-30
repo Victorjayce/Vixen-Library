@@ -27,14 +27,18 @@ class NavCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: fg, size: 35),
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: TextStyle(
-              color: fg,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+          Icon(icon, color: fg, size: 24),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: fg,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
         ],

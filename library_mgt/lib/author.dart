@@ -3,6 +3,7 @@ import 'package:library_mgt/lib.dart';
 import 'dart:ui' as ui;
 import 'widgets/containertitle.dart';
 import 'widgets/actioncard.dart';
+import 'package:flutter/services.dart';
 
 class AuthorPage extends StatefulWidget {
   const AuthorPage({super.key});
@@ -17,198 +18,267 @@ class _AuthorPageState extends State<AuthorPage> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('--Author\'s--'),
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: Icon(Icons.close),
-              color: Colors.blue,
-              iconSize: 40,
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => {Navigator.pushNamed(context, '/')},
-                        child: NavCard(
-                          icon: Icons.book,
-                          text: 'Books',
-                          onPage: false,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    NavCard(icon: Icons.person, text: 'Authors', onPage: true),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => {
-                          Navigator.pushNamed(context, '/rentedscreen'),
-                        },
-                        child: NavCard(
-                          icon: Icons.bookmark_added,
-                          text: 'Rented',
-                          onPage: false,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        final exit = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              icon: const Icon(
+                Icons.error_outline,
+                color: Colors.orange,
+                size: 40,
               ),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: library.authors.length,
-                  itemBuilder: (context, index) {
-                    final author = library.authors[index];
-                    return ListTile(
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/authordetail',
-                          arguments: AuthorDetailArgs(
-                            booksId: author.booksId,
-                            name: author.name,
-                          ),
-                        );
-                      },
-                      leading: const Icon(
-                        Icons.person,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      title: Hero(
-                        tag: 'name-${author.name}',
-                        transitionOnUserGestures: true,
-                        child: Text(
-                          author.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.normal,
-                            fontFamily: 'Roboto',
-                            letterSpacing: 0.5,
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ),
-                      subtitle: author.booksId.isNotEmpty
-                          ? Text(
-                              '${author.booksId.length.toString()} Books Published',
-                            )
-                          : Text('No Books Published'),
-                      trailing: Icon(
-                        Icons.remove_red_eye,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                    );
+              title: const Text('Exit App'),
+              content: const Text('You are about to exit the application.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
                   },
-                  separatorBuilder: (context, index) =>
-                      const Divider(indent: 16, endIndent: 16, thickness: 1),
+                  child: const Text('Cancel'),
                 ),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text('Continue'),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (exit == true) {
+          SystemNavigator.pop(); // Pops the last route (exits if it's the root)
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: const Text('Vixen Library'),
+          automaticallyImplyLeading: false,
+          actions: [
+            Builder(
+              builder: (context) => IconButton(
+                icon: Icon(Icons.close),
+                color: Colors.blue,
+                iconSize: 40,
+                onPressed: () => Navigator.pop(context),
               ),
-            ],
-          ),
-          Visibility(
-            visible: showAddauthor,
-            maintainState: true,
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: AnimatedScale(
-                scale: showAddauthor ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 250),
-                alignment: Alignment.center,
-                child: Container(
-                  padding: EdgeInsets.all(50),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            ContainerTitle(title: 'New Author'),
-                          ],
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => {
+                            Navigator.pushReplacementNamed(context, '/'),
+                          },
+                          child: NavCard(
+                            icon: Icons.book,
+                            text: 'Books',
+                            onPage: false,
+                          ),
                         ),
-                        TextField(
-                          controller: _authornamecontroller,
-                          decoration: InputDecoration(
-                            labelText: 'Author Name',
-                            hintText: 'Enter new Author\'s name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                      ),
+                      const SizedBox(width: 12),
+                      NavCard(
+                        icon: Icons.person,
+                        text: 'Authors',
+                        onPage: true,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/rentedscreen',
                             ),
-                            prefixIcon: Icon(
-                              Icons.person,
+                          },
+                          child: NavCard(
+                            icon: Icons.bookmark_added,
+                            text: 'Rented',
+                            onPage: false,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: library.authors.length,
+                    itemBuilder: (context, index) {
+                      final author = library.authors[index];
+                      return ListTile(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/authordetail',
+                            arguments: AuthorDetailArgs(
+                              booksId: author.booksId,
+                              name: author.name,
+                            ),
+                          );
+                        },
+                        leading: const Icon(
+                          Icons.person,
+                          color: Colors.blue,
+                          size: 30,
+                        ),
+                        title: Hero(
+                          tag: 'name-${author.name}',
+                          transitionOnUserGestures: true,
+                          child: Text(
+                            author.name,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.normal,
+                              fontFamily: 'Roboto',
+                              letterSpacing: 0.5,
                               color: Colors.blue,
-                              size: 30,
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            IconButton(
-                              onPressed: _addauthor,
-                              icon: Icon(Icons.close, color: Colors.red),
-                              iconSize: 40,
-                              color: Colors.blue,
-                            ),
-                            SizedBox(width: 40),
-                            IconButton(
-                              onPressed: () => _savenewauthor(context),
-                              icon: Icon(Icons.check, color: Colors.green),
-                              iconSize: 40,
-                              color: Colors.blue,
-                            ),
-                          ],
+                        subtitle: author.booksId.isNotEmpty
+                            ? Text(
+                                '${author.booksId.length.toString()} Books Published',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontFamily: 'Roboto',
+                                  letterSpacing: 0.5,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
+                              )
+                            : Text(
+                                'No Books Published',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontFamily: 'Roboto',
+                                  letterSpacing: 0.5,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
+                              ),
+                        trailing: Icon(
+                          Icons.remove_red_eye,
+                          color: Colors.blue,
+                          size: 30,
                         ),
-                      ],
+                      );
+                    },
+                    separatorBuilder: (context, index) =>
+                        const Divider(indent: 16, endIndent: 16, thickness: 1),
+                  ),
+                ),
+              ],
+            ),
+            Visibility(
+              visible: showAddauthor,
+              maintainState: true,
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: AnimatedScale(
+                  scale: showAddauthor ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 250),
+                  alignment: Alignment.center,
+                  child: Container(
+                    padding: EdgeInsets.all(50),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ContainerTitle(title: 'New Author'),
+                            ],
+                          ),
+                          TextField(
+                            controller: _authornamecontroller,
+                            decoration: InputDecoration(
+                              labelText: 'Author Name',
+                              hintText: 'Enter new Author\'s name',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              prefixIcon: Icon(
+                                Icons.person,
+                                color: Colors.blue,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              IconButton(
+                                onPressed: _addauthor,
+                                icon: Icon(Icons.close, color: Colors.red),
+                                iconSize: 40,
+                                color: Colors.blue,
+                              ),
+                              SizedBox(width: 40),
+                              IconButton(
+                                onPressed: () => _savenewauthor(context),
+                                icon: Icon(Icons.check, color: Colors.green),
+                                iconSize: 40,
+                                color: Colors.blue,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
+          ],
+        ),
+        floatingActionButton: AnimatedScale(
+          scale: showAddauthor ? 1.0 : 0,
+          duration: Duration(milliseconds: 250),
+          child: FloatingActionButton(
+            onPressed: _addauthor,
+            tooltip: 'Add Authors',
+            child: Icon(Icons.person_add, size: 40, color: Colors.blue),
           ),
-        ],
-      ),
-      floatingActionButton: AnimatedScale(
-        scale: showAddauthor ? 1.0 : 0,
-        duration: Duration(milliseconds: 250),
-        child: FloatingActionButton(
-          onPressed: _addauthor,
-          tooltip: 'Add Authors',
-          child: Icon(Icons.person_add, size: 40, color: Colors.blue),
         ),
       ),
     );

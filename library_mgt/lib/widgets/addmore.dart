@@ -35,7 +35,11 @@ class _AddMoreState extends State<AddMore> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0.3),
+              ),
             ),
             padding: EdgeInsets.all(2),
             child: Row(

@@ -58,10 +58,10 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                           radius: 22,
                           backgroundColor: Colors.blue,
                           backgroundImage: null,
-                          child: const Icon(
+                          child: Icon(
                             Icons.person,
                             size: 40,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                           ),
                         ),
                         Hero(
@@ -128,16 +128,30 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                     MainAxisAlignment.spaceBetween,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text('by ${book.author}'),
                                   Text(
-                                    '${book.available} pieces',
-                                    style: const TextStyle(
+                                    'by ${book.author}',
+                                    style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       fontStyle: FontStyle.normal,
                                       fontFamily: 'Roboto',
                                       letterSpacing: 0.5,
-                                      color: Colors.black,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${book.available} pieces',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FontStyle.normal,
+                                      fontFamily: 'Roboto',
+                                      letterSpacing: 0.5,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
                                     ),
                                   ),
                                 ],
@@ -156,16 +170,20 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                     ),
                                     iconSize: 30,
                                   ),
-                                  IconButton(
-                                    onPressed: () => {
-                                      _callrent(book.title, book.id),
-                                    },
-                                    tooltip: 'Rent this Book',
-                                    icon: Icon(
-                                      Icons.bookmark_add,
-                                      color: Colors.blue,
+                                  Visibility(
+                                    visible: book.available > 0,
+                                    maintainState: true,
+                                    child: IconButton(
+                                      onPressed: () => {
+                                        _callrent(book.title, book.id),
+                                      },
+                                      tooltip: 'Rent this Book',
+                                      icon: Icon(
+                                        Icons.bookmark_add,
+                                        color: Colors.blue,
+                                      ),
+                                      iconSize: 30,
                                     ),
-                                    iconSize: 30,
                                   ),
                                 ],
                               ),

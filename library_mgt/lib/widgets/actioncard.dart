@@ -14,7 +14,7 @@ class NavCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = onPage ? Colors.white : Colors.blue;
+    final fg = onPage ? Theme.of(context).colorScheme.surface : Colors.blue;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

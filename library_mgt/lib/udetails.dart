@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'lib.dart';
 import 'widgets/containertitle.dart';
 import 'widgets/return.dart';
+import 'widgets/rent.dart';
 
 class UserDetail extends StatefulWidget {
   const UserDetail({super.key, required this.user});
@@ -59,17 +60,32 @@ class _UserDetailState extends State<UserDetail> {
                 ),
               ],
             ),
-            if (widget.user.rentId.length > 1)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  ContainerTitle(
-                    title: widget.user.rentId.length == 1
-                        ? '${widget.user.rentId.length} Book rented'
-                        : '${widget.user.rentId.length} Books rented',
+                  Visibility(
+                    visible: widget.user.rentId.length > 1,
+                    child: ContainerTitle(
+                      title: widget.user.rentId.length == 1
+                          ? '${widget.user.rentId.length} Book rented'
+                          : '${widget.user.rentId.length} Books rented',
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => {
+                      _callrent(widget.user.name, widget.user.id),
+                    },
+                    icon: Icon(Icons.bookmark_add),
+                    tooltip: 'Rent book',
+                    color: Colors.blue,
+                    iconSize: 40,
                   ),
                 ],
               ),
+            ),
             Expanded(
               child: widget.user.rentId.isEmpty
                   ? const Center(
@@ -172,6 +188,30 @@ class _UserDetailState extends State<UserDetail> {
               ? Text('$quantity book returned to Library')
               : Text('$quantity books returned to Library'),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
+  }
+
+  Future<void> _callrent(String userName, int userId) async {
+    int? result = await showRentsheet(
+      context,
+      userId: userId,
+      userName: userName,
+    );
+    if (result != 0 && result != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: result == 1
+              ? Text('$result book rented from Library')
+              : Text('$result books rented from Library'),
+          behavior: SnackBarBehavior.fixed,
           backgroundColor: Colors.blue.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           margin: EdgeInsets.all(16),

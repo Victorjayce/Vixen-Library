@@ -26,6 +26,16 @@ Future<int?> showRentsheet(
   int userId = 0,
   String userName = '',
 }) {
+  final libbooks = LibraryProvider.of(context).books;
+  if (bookName.isEmpty && libbooks.isNotEmpty) {
+    bookName = libbooks.first.title;
+    bookId = libbooks.first.id;
+  }
+  final libuser = LibraryProvider.of(context).users;
+  if (userName.isEmpty && libuser.isNotEmpty) {
+    userName = libuser.first.name;
+    userId = libuser.first.id;
+  }
   return showModalBottomSheet(
     context: context,
     backgroundColor: Theme.of(context).colorScheme.surface,
@@ -76,14 +86,10 @@ class _RentState extends State<Rent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.bookName.isEmpty) {
-      final lib = LibraryProvider.of(context);
-      selectedBook = lib.books.isNotEmpty ? lib.books.first.title : '';
-      bookId = lib.books.first.id;
-    } else {
-      selectedBook = widget.bookName;
-      bookId = widget.bookId;
-    }
+    selectedBook = widget.bookName;
+    bookId = widget.bookId;
+    selectedUser = widget.userName;
+    userId = widget.userId;
   }
 
   @override

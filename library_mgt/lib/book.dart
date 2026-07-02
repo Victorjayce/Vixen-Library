@@ -38,12 +38,12 @@ class _HomePageState extends State<HomePage>
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
                     'Books In Library',
                     style: TextStyle(
                       fontSize: 20,
@@ -54,18 +54,15 @@ class _HomePageState extends State<HomePage>
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: IconButton(
+                  IconButton(
                     onPressed: () => _addbooks(),
                     tooltip: 'Add Book',
                     iconSize: 40,
                     color: Colors.blue,
                     icon: const Icon(Icons.add),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Expanded(
               child: library.books.isEmpty
@@ -315,10 +312,5 @@ class _HomePageState extends State<HomePage>
         ),
       );
     }
-    setState(() {
-      rentbookId = id;
-      rentbookName = name;
-      showrent = true;
-    });
   }
 }

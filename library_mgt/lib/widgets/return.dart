@@ -209,18 +209,5 @@ class _ReturnState extends State<Return> {
   void _return(BuildContext context) {
     library.returnBook(widget.rental.id, quantity);
     Navigator.pop(context, quantity);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: quantity == 1
-            ? Text('$quantity book returned to Library')
-            : Text('$quantity books returned to Library'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.blue.withValues(alpha: 0.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: EdgeInsets.all(16),
-        duration: Duration(seconds: 2),
-        showCloseIcon: true,
-      ),
-    );
   }
 }

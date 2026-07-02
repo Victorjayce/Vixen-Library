@@ -70,7 +70,7 @@ class _HomeState extends State<Home> {
         );
 
         if (exit == true) {
-          SystemNavigator.pop(); // Pops the last route (exits if it's the root)
+          SystemNavigator.pop();
         }
       },
       child: Scaffold(

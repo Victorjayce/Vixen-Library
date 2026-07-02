@@ -79,7 +79,7 @@ class _RentedPageState extends State<RentedPage>
                                 ),
                                 const SizedBox(width: 20),
                                 Text(
-                                  '${book.rented} rented by',
+                                  '${rental.quantity} rented by',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal,
@@ -92,15 +92,18 @@ class _RentedPageState extends State<RentedPage>
                                   ),
                                 ),
                                 const SizedBox(width: 3),
-                                Text(
-                                  user.name,
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.normal,
-                                    fontFamily: 'Roboto',
-                                    letterSpacing: 0.5,
-                                    color: Colors.blue,
+                                InkWell(
+                                  onTap: () => {},
+                                  child: Text(
+                                    user.name,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FontStyle.normal,
+                                      fontFamily: 'Roboto',
+                                      letterSpacing: 0.5,
+                                      color: Colors.blue,
+                                    ),
                                   ),
                                 ),
                               ],

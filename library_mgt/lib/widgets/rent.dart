@@ -18,6 +18,11 @@ Future<int?> showRentsheet(
 }) {
   return showModalBottomSheet(
     context: context,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    clipBehavior: Clip.antiAlias,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
     builder: (context) {
       return SafeArea(
         child: Column(
@@ -47,7 +52,9 @@ Future<int?> showRentsheet(
 class _RentState extends State<Rent> {
   int quantity = 1;
   String selectedBook = '';
+  String selectedUser = '';
   int bookId = 0;
+  int userId = 0;
   bool showdecrement = false;
   bool showincrement = true;
 
@@ -82,7 +89,7 @@ class _RentState extends State<Rent> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[ContainerTitle(title: 'Rent Books')],
+                  children: <Widget>[ContainerTitle(title: 'Rent Book')],
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -90,37 +97,80 @@ class _RentState extends State<Rent> {
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Row(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.book, color: Colors.blue, size: 28),
-                      const SizedBox(width: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.book, color: Colors.blue, size: 28),
+                          const SizedBox(width: 10),
 
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: selectedBook,
-                          isExpanded: true,
-                          underline:
-                              const SizedBox(), // removes default underline
-                          items: [
-                            ...library.bookNames.map(
-                              (name) => DropdownMenuItem(
-                                value: name,
-                                child: Text(name),
-                              ),
+                          Expanded(
+                            child: DropdownButton<String>(
+                              value: selectedBook,
+                              isExpanded: true,
+                              underline:
+                                  const SizedBox(), // removes default underline
+                              items: [
+                                ...library.bookNames.map(
+                                  (name) => DropdownMenuItem(
+                                    value: name,
+                                    child: Text(name),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedBook = value!;
+                                  quantity = 1;
+                                  showdecrement = false;
+                                });
+
+                                bookId = (library.books.firstWhere(
+                                  (b) => b.title == value!,
+                                )).id;
+                              },
                             ),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              selectedBook = value!;
-                              quantity = 1;
-                              showdecrement = false;
-                            });
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.people,
+                            color: Colors.blue,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
 
-                            bookId = (library.books.firstWhere(
-                              (b) => b.title == value!,
-                            )).id;
-                          },
-                        ),
+                          Expanded(
+                            child: DropdownButton<String>(
+                              value: selectedUser,
+                              isExpanded: true,
+                              underline:
+                                  const SizedBox(), // removes default underline
+                              items: [
+                                ...library.userNames.map(
+                                  (name) => DropdownMenuItem(
+                                    value: name,
+                                    child: Text(name),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedUser = value!;
+                                  quantity = 1;
+                                });
+
+                                userId = (library.users.firstWhere(
+                                  (b) => b.name == value!,
+                                )).id;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -208,7 +258,7 @@ class _RentState extends State<Rent> {
     });
   }
 
-  void _rent(BuildContext context) {
+  Future<void> _rent(BuildContext context) async {
     if (bookId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -224,7 +274,36 @@ class _RentState extends State<Rent> {
 
       return;
     }
-    //library.rentBook(bookId, quantity);
+
+    final rent = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: const Icon(Icons.info_outline, color: Colors.orange, size: 40),
+          title: Text(''),
+          content: Text('You are about to rent $quantity books to username?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+    if (!context.mounted) return;
+    if (!rent!) {
+      Navigator.pop(context);
+    }
+    library.rentBook(bookId, quantity, userId);
     Navigator.pop(context, quantity);
   }
 }

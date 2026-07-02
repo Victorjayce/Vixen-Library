@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:library_mgt/widgets/return.dart';
 import 'lib.dart';
-import 'dart:ui' as ui;
 
 class RentedPage extends StatefulWidget {
   const RentedPage({super.key});
@@ -110,7 +109,7 @@ class _RentedPageState extends State<RentedPage>
                             ),
                           ),
                           trailing: IconButton(
-                            onPressed: () => {_callreturn(book.title, book.id)},
+                            onPressed: () => {callreturnsheet(context, rental)},
                             tooltip: 'Return Book',
                             icon: Icon(Icons.undo, color: Colors.blue),
                             iconSize: 30,
@@ -126,35 +125,27 @@ class _RentedPageState extends State<RentedPage>
             ),
           ],
         ),
-        Visibility(
-          visible: showreturn,
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: AnimatedScale(
-              scale: showreturn ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: Return(
-                onClose: () {
-                  setState(() {
-                    showreturn = false;
-                  });
-                },
-                bookId: bookId,
-                bookName: bookName,
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
 
-  int rent = 0;
-  void _callreturn(String name, int id) {
-    setState(() {
-      bookId = id;
-      bookName = name;
-      showreturn = true;
-    });
+  Future<void> callreturnsheet(BuildContext context, Rental rental) async {
+    final quantity = await showReturnsheet(context, rental: rental);
+    if (!context.mounted) return;
+    if (quantity != 0 && quantity != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: quantity == 1
+              ? Text('$quantity book returned to Library')
+              : Text('$quantity books returned to Library'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 }

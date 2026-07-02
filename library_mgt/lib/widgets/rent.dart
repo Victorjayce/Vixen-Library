@@ -3,9 +3,17 @@ import 'package:library_mgt/lib.dart';
 import 'containertitle.dart';
 
 class Rent extends StatefulWidget {
-  const Rent({super.key, this.bookName = '', this.bookId = 0});
+  const Rent({
+    super.key,
+    this.bookName = '',
+    this.bookId = 0,
+    this.userId = 0,
+    this.userName = '',
+  });
   final String bookName;
   final int bookId;
+  final int userId;
+  final String userName;
 
   @override
   State<Rent> createState() => _RentState();
@@ -15,6 +23,8 @@ Future<int?> showRentsheet(
   BuildContext context, {
   String bookName = '',
   int bookId = 0,
+  int userId = 0,
+  String userName = '',
 }) {
   return showModalBottomSheet(
     context: context,
@@ -41,7 +51,12 @@ Future<int?> showRentsheet(
             ),
 
             const SizedBox(height: 16),
-            Rent(bookName: bookName, bookId: bookId),
+            Rent(
+              bookName: bookName,
+              bookId: bookId,
+              userId: userId,
+              userName: userName,
+            ),
           ],
         ),
       );
@@ -281,7 +296,9 @@ class _RentState extends State<Rent> {
         return AlertDialog(
           icon: const Icon(Icons.info_outline, color: Colors.orange, size: 40),
           title: Text(''),
-          content: Text('You are about to rent $quantity books to username?'),
+          content: Text(
+            'You are about to rent $quantity books to ${widget.userName}?',
+          ),
           actions: [
             TextButton(
               onPressed: () {

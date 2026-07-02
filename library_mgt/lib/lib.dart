@@ -293,6 +293,10 @@ class Library extends ChangeNotifier {
     return _books.where((book) => ids.contains(book.id)).toList();
   }
 
+  List<Rental> userRentals(List<int> ids) {
+    return _rented.where((r) => ids.contains(r.id)).toList();
+  }
+
   void rentBook(int bookId, int amount, int userId) {
     if (_books.isEmpty) {
       return;
@@ -319,14 +323,14 @@ class Library extends ChangeNotifier {
     }
   }
 
-  void returnBook(int rentId, int amount, int userId) {
+  void returnBook(int rentId, int amount) {
     if (rented.isEmpty || _rented.isEmpty) return;
     final rental = _rented.firstWhere((r) => r.id == rentId);
     final book = _books.firstWhere(
       (b) => b.id == rental.bookid,
       orElse: () => throw StateError('Book not found'),
     );
-    final user = _users.firstWhere((u) => u.id == userId);
+    final user = _users.firstWhere((u) => u.id == rental.userid);
     if (book.rented >= amount && rental.quantity >= amount) {
       book.rented -= amount;
       book.available += amount;

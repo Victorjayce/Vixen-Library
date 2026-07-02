@@ -35,23 +35,16 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     final author = library.getauthor(widget.authorId);
     final List<Book> authorbooks = library.authorBooks(widget.booksId);
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.onSurface,
+        title: Text('Author - ${author.name}'),
+      ),
       body: SafeArea(
         child: Stack(
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    IconButton(
-                      tooltip: 'Close',
-                      onPressed: () => {Navigator.pop(context)},
-                      icon: Icon(Icons.cancel, color: Colors.red),
-                      iconSize: 40,
-                    ),
-                  ],
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[

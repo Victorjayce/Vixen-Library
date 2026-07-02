@@ -3,37 +3,62 @@ import 'package:library_mgt/lib.dart';
 import 'containertitle.dart';
 
 class Return extends StatefulWidget {
-  const Return({
-    super.key,
-    required this.onClose,
-    this.bookName = '',
-    this.bookId = 0,
-  });
+  const Return({super.key, required this.rental});
 
-  final VoidCallback onClose;
-  final String bookName;
-  final int bookId;
+  final Rental rental;
   @override
   State<Return> createState() => _ReturnState();
+}
+
+Future<int?> showReturnsheet(BuildContext context, {required Rental rental}) {
+  return showModalBottomSheet(
+    context: context,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    clipBehavior: Clip.antiAlias,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+
+            // Drag handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            Return(rental: rental),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 class _ReturnState extends State<Return> {
   int quantity = 1;
   String selectedBook = '';
+  String userName = '';
   int bookId = 0;
   bool showdecrement = false;
   bool showincrement = true;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.bookName.isEmpty) {
-      final lib = LibraryProvider.of(context);
-      selectedBook = lib.books.isNotEmpty ? lib.books.first.title : '';
-      bookId = lib.books.first.id;
-    } else {
-      selectedBook = widget.bookName;
-      bookId = widget.bookId;
-    }
+    final book = LibraryProvider.of(context).getbook(widget.rental.bookid);
+    final user = LibraryProvider.of(context).getuser(widget.rental.userid);
+    selectedBook = book.title;
+    bookId = book.id;
+    userName = user.name;
   }
 
   @override
@@ -68,7 +93,7 @@ class _ReturnState extends State<Return> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text(
-                              'Return ${widget.bookName}',
+                              'Return $selectedBook rented by $userName',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -124,7 +149,7 @@ class _ReturnState extends State<Return> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      onPressed: widget.onClose,
+                      onPressed: () => {Navigator.pop(context, 0)},
                       icon: const Icon(
                         Icons.close,
                         color: Colors.red,
@@ -182,8 +207,8 @@ class _ReturnState extends State<Return> {
   }
 
   void _return(BuildContext context) {
-    //library.returnBook(bookId, quantity);
-    widget.onClose();
+    library.returnBook(widget.rental.id, quantity);
+    Navigator.pop(context, quantity);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: quantity == 1
@@ -197,6 +222,5 @@ class _ReturnState extends State<Return> {
         showCloseIcon: true,
       ),
     );
-    quantity = 1;
   }
 }

@@ -3,18 +3,45 @@ import 'package:library_mgt/lib.dart';
 import 'containertitle.dart';
 
 class Rent extends StatefulWidget {
-  const Rent({
-    super.key,
-    required this.onClose,
-    this.bookName = '',
-    this.bookId = 0,
-  });
-  final VoidCallback onClose;
+  const Rent({super.key, this.bookName = '', this.bookId = 0});
   final String bookName;
   final int bookId;
 
   @override
   State<Rent> createState() => _RentState();
+}
+
+Future<int?> showRentsheet(
+  BuildContext context, {
+  String bookName = '',
+  int bookId = 0,
+}) {
+  return showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+
+            // Drag handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            Rent(bookName: bookName, bookId: bookId),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 class _RentState extends State<Rent> {
@@ -40,152 +67,114 @@ class _RentState extends State<Rent> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
-
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surface.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            ContainerTitle(title: 'Rent Books'),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.book,
-                                color: Colors.blue,
-                                size: 28,
-                              ),
-                              const SizedBox(width: 10),
-
-                              Expanded(
-                                child: DropdownButton<String>(
-                                  value: selectedBook,
-                                  isExpanded: true,
-                                  underline:
-                                      const SizedBox(), // removes default underline
-                                  items: [
-                                    ...library.bookNames.map(
-                                      (name) => DropdownMenuItem(
-                                        value: name,
-                                        child: Text(name),
-                                      ),
-                                    ),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedBook = value!;
-                                      quantity = 1;
-                                      showdecrement = false;
-                                    });
-
-                                    bookId = (library.books.firstWhere(
-                                      (b) => b.title == value!,
-                                    )).id;
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(2),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              AnimatedScale(
-                                scale: showdecrement ? 1.0 : 0,
-                                duration: Duration(milliseconds: 200),
-                                child: IconButton(
-                                  onPressed: () => {_decrement(context)},
-                                  icon: Icon(
-                                    Icons.remove_circle,
-                                    color: Colors.red,
-                                  ),
-                                  iconSize: 40,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                              ContainerTitle(title: quantity.toString()),
-                              AnimatedScale(
-                                scale: showincrement ? 1.0 : 0,
-                                duration: Duration(milliseconds: 200),
-                                child: IconButton(
-                                  onPressed: () => {_increment(context)},
-                                  icon: Icon(
-                                    Icons.add_circle,
-                                    color: Colors.blue,
-                                  ),
-                                  iconSize: 40,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: widget.onClose,
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 50,
+                  children: <Widget>[ContainerTitle(title: 'Rent Books')],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.book, color: Colors.blue, size: 28),
+                      const SizedBox(width: 10),
+
+                      Expanded(
+                        child: DropdownButton<String>(
+                          value: selectedBook,
+                          isExpanded: true,
+                          underline:
+                              const SizedBox(), // removes default underline
+                          items: [
+                            ...library.bookNames.map(
+                              (name) => DropdownMenuItem(
+                                value: name,
+                                child: Text(name),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedBook = value!;
+                              quantity = 1;
+                              showdecrement = false;
+                            });
+
+                            bookId = (library.books.firstWhere(
+                              (b) => b.title == value!,
+                            )).id;
+                          },
+                        ),
                       ),
-                      tooltip: 'Cancel',
-                    ),
-                    SizedBox(width: 40),
-                    IconButton(
-                      onPressed: () => _rent(context),
-                      icon: const Icon(
-                        Icons.check,
-                        color: Colors.green,
-                        size: 50,
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      AnimatedScale(
+                        scale: showdecrement ? 1.0 : 0,
+                        duration: Duration(milliseconds: 200),
+                        child: IconButton(
+                          onPressed: () => {_decrement(context)},
+                          icon: Icon(Icons.remove_circle, color: Colors.red),
+                          iconSize: 40,
+                          color: Colors.blue,
+                        ),
                       ),
-                      tooltip: 'Save',
-                    ),
-                  ],
+                      ContainerTitle(title: quantity.toString()),
+                      AnimatedScale(
+                        scale: showincrement ? 1.0 : 0,
+                        duration: Duration(milliseconds: 200),
+                        child: IconButton(
+                          onPressed: () => {_increment(context)},
+                          icon: Icon(Icons.add_circle, color: Colors.blue),
+                          iconSize: 40,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: () => Navigator.pop(context, 0),
+                icon: const Icon(Icons.close, color: Colors.red, size: 50),
+                tooltip: 'Cancel',
+              ),
+              SizedBox(width: 40),
+              IconButton(
+                onPressed: () => _rent(context),
+                icon: const Icon(Icons.check, color: Colors.green, size: 50),
+                tooltip: 'Save',
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -232,23 +221,10 @@ class _RentState extends State<Rent> {
           showCloseIcon: false,
         ),
       );
+
       return;
     }
     //library.rentBook(bookId, quantity);
-    widget.onClose();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: quantity == 1
-            ? Text('$quantity book rented from Library')
-            : Text('$quantity books rented from Library'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.blue.withValues(alpha: 0.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: EdgeInsets.all(16),
-        duration: Duration(seconds: 2),
-        showCloseIcon: true,
-      ),
-    );
-    quantity = 1;
+    Navigator.pop(context, quantity);
   }
 }

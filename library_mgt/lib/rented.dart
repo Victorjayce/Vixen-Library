@@ -9,13 +9,18 @@ class RentedPage extends StatefulWidget {
   State<RentedPage> createState() => _RentedPageState();
 }
 
-class _RentedPageState extends State<RentedPage> {
+class _RentedPageState extends State<RentedPage>
+    with AutomaticKeepAliveClientMixin {
   bool showreturn = false;
   String bookName = '';
   int bookId = 0;
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final rented = LibraryProvider.of(context).rented;
+    final rentals = LibraryProvider.of(context).rentals;
     return Stack(
       children: [
         Column(
@@ -34,9 +39,11 @@ class _RentedPageState extends State<RentedPage> {
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: rented.length,
+                      itemCount: rentals.length,
                       itemBuilder: (context, index) {
-                        final book = rented[index];
+                        final rental = rentals[index];
+                        final book = library.getbook(rental.bookid);
+                        final user = library.getuser(rental.userid);
                         return ListTile(
                           leading: const Icon(Icons.book, color: Colors.blue),
                           title: Text(
@@ -50,41 +57,58 @@ class _RentedPageState extends State<RentedPage> {
                               color: Colors.blue,
                             ),
                           ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'by ${book.author}',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.normal,
-                                  fontFamily: 'Roboto',
-                                  letterSpacing: 0.5,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
+                          subtitle: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'by ${book.author}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FontStyle.normal,
+                                    fontFamily: 'Roboto',
+                                    letterSpacing: 0.5,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '${book.rented} rented',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.normal,
-                                  fontFamily: 'Roboto',
-                                  letterSpacing: 0.5,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
+                                const SizedBox(width: 20),
+                                Text(
+                                  '${book.rented} rented by',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FontStyle.normal,
+                                    fontFamily: 'Roboto',
+                                    letterSpacing: 0.5,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 3),
+                                Text(
+                                  user.name,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.normal,
+                                    fontFamily: 'Roboto',
+                                    letterSpacing: 0.5,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           trailing: IconButton(
                             onPressed: () => {_callreturn(book.title, book.id)},
-                            tooltip: 'Return this Book',
+                            tooltip: 'Return Book',
                             icon: Icon(Icons.undo, color: Colors.blue),
                             iconSize: 30,
                           ),

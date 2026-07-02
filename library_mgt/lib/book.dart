@@ -14,7 +14,8 @@ class HomePage extends StatefulWidget {
 
 enum MenuAction { rent, addmore, edit, delete }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   bool showAddbook = false;
   bool showAddmore = false;
   bool showFab = false;
@@ -25,15 +26,47 @@ class _HomePageState extends State<HomePage> {
   int rentbookId = 0;
 
   @override
-  Widget build(BuildContext context) {
-    final library = LibraryProvider.of(context);
+  bool get wantKeepAlive => true;
 
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final library = LibraryProvider.of(context);
     return Stack(
       alignment: Alignment.center,
       children: [
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Books In Library',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.normal,
+                      fontFamily: 'Roboto',
+                      letterSpacing: 0.5,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: IconButton(
+                    onPressed: () => _addbooks(),
+                    tooltip: 'Add Book',
+                    iconSize: 40,
+                    color: Colors.blue,
+                    icon: const Icon(Icons.add),
+                  ),
+                ),
+              ],
+            ),
             Expanded(
               child: library.books.isEmpty
                   ? const Center(
@@ -68,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                                 'by ${book.author}',
                                 style: TextStyle(
                                   fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.normal,
                                   fontStyle: FontStyle.normal,
                                   fontFamily: 'Roboto',
                                   letterSpacing: 0.5,
@@ -229,25 +262,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        Visibility(
-          visible: showrent,
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: AnimatedScale(
-              scale: showrent ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: Rent(
-                onClose: () {
-                  setState(() {
-                    showrent = false;
-                  });
-                },
-                bookId: rentbookId,
-                bookName: rentbookName,
-              ),
-            ),
-          ),
-        ),
       ],
     );
     // floatingActionButton: IgnorePointer(
@@ -283,7 +297,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _callrent(String name, int id) {
+  Future<void> _callrent(String name, int id) async {
+    int? result = await showRentsheet(context, bookName: name, bookId: id);
+    if (result != 0 && result != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: result == 1
+              ? Text('$result book rented from Library')
+              : Text('$result books rented from Library'),
+          behavior: SnackBarBehavior.fixed,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
     setState(() {
       rentbookId = id;
       rentbookName = name;

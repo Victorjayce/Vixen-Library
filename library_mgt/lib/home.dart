@@ -13,8 +13,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final pageController = PageController();
   int selectedIndex = 0;
   final List<Widget> pages = [DashBoard(), HomePage(), RentedPage()];
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -74,7 +81,7 @@ class _HomeState extends State<Home> {
           actions: [
             Builder(
               builder: (context) => IconButton(
-                icon: const Icon(Icons.menu),
+                icon: const Icon(Icons.info_outline),
                 color: Theme.of(context).colorScheme.surface,
                 iconSize: 40,
                 onPressed: () => _opendrawer(context),
@@ -141,7 +148,15 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        body: IndexedStack(index: selectedIndex, children: pages),
+        body: PageView(
+          controller: pageController,
+          onPageChanged: (index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          children: pages,
+        ),
         bottomNavigationBar: NavigationBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
           selectedIndex: selectedIndex,
@@ -215,9 +230,11 @@ class _HomeState extends State<Home> {
               );
               return;
             }
-            setState(() {
-              selectedIndex = index;
-            });
+            pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+            );
           },
           destinations: const [
             NavigationDestination(

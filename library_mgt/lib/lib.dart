@@ -242,7 +242,7 @@ class Library extends ChangeNotifier {
 
   List<Book> get books => List.unmodifiable(_books);
   List<User> get users => List.unmodifiable(_users);
-  List<Rental> get rent => List.unmodifiable(_rented);
+  List<Rental> get rentals => List.unmodifiable(_rented);
   List<Author> get authors => List.unmodifiable(_authors);
   List<String> get authorNames =>
       _authors.map((author) => author.name).toList();

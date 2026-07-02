@@ -312,25 +312,6 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                 ),
               ),
             ),
-            Visibility(
-              visible: showrent,
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedScale(
-                  scale: showrent ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Rent(
-                    onClose: () {
-                      setState(() {
-                        showrent = false;
-                      });
-                    },
-                    bookId: rentbookId,
-                    bookName: rentbookName,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -398,7 +379,24 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     });
   }
 
-  void _callrent(String name, int id) {
+  Future<void> _callrent(String name, int id) async {
+    int? result = await showRentsheet(context, bookName: name, bookId: id);
+    if (result != 0 && result != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: result == 1
+              ? Text('$result book rented from Library')
+              : Text('$result books rented from Library'),
+          behavior: SnackBarBehavior.fixed,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
     setState(() {
       rentbookId = id;
       rentbookName = name;

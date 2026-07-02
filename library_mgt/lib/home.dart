@@ -1,34 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:library_mgt/lib.dart';
-import 'package:library_mgt/widgets/actioncard.dart';
-import 'package:library_mgt/widgets/addbook.dart';
-import 'package:library_mgt/widgets/addmore.dart';
+import 'package:library_mgt/dashboard.dart';
+import 'package:library_mgt/book.dart';
+import 'package:library_mgt/rented.dart';
 import 'widgets/containertitle.dart';
-import 'dart:ui' as ui;
-import 'widgets/rent.dart';
 import 'package:flutter/services.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Home> createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-  bool showAddbook = false;
-  bool showAddmore = false;
-  bool showFab = false;
-  int addbookId = 0;
-
-  bool showrent = false;
-  String rentbookName = '';
-  int rentbookId = 0;
-
+class _HomeState extends State<Home> {
+  int selectedIndex = 0;
+  final List<Widget> pages = [DashBoard(), HomePage(), RentedPage()];
   @override
   Widget build(BuildContext context) {
-    final library = LibraryProvider.of(context);
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -38,13 +26,24 @@ class _HomePageState extends State<HomePage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               icon: const Icon(
                 Icons.error_outline,
                 color: Colors.orange,
                 size: 40,
               ),
-              title: const Text('Exit App'),
-              content: const Text('You are about to exit the application.'),
+              title: Text(
+                'Exit App',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              content: Text(
+                'You are about to exit the application.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -142,286 +141,112 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        body: Stack(
-          alignment: Alignment.center,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        child: NavCard(
-                          icon: Icons.book,
-                          text: 'Books',
-                          onPage: true,
+        body: IndexedStack(index: selectedIndex, children: pages),
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (index) {
+            if (index == 3) {
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                clipBehavior: Clip.antiAlias,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                builder: (context) {
+                  return SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 12),
+
+                        // Drag handle
+                        Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () => {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/authorscreen',
+
+                        const SizedBox(height: 16),
+                        ListTile(
+                          leading: Icon(Icons.person, color: Colors.blue),
+                          title: Text(
+                            'Authors',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.normal,
+                              fontFamily: 'Roboto',
+                              letterSpacing: 0.5,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
-                          },
-                          child: NavCard(
-                            icon: Icons.person,
-                            text: 'Authors',
-                            onPage: false,
                           ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, '/authorscreen');
+                          },
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () => {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/rentedscreen',
+                        ListTile(
+                          leading: Icon(Icons.people, color: Colors.blue),
+                          title: Text(
+                            'Users',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.normal,
+                              fontFamily: 'Roboto',
+                              letterSpacing: 0.5,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, '/userscreen');
                           },
-                          child: NavCard(
-                            icon: Icons.bookmark_added,
-                            text: 'Rented',
-                            onPage: false,
-                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: library.books.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No books available yet.',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: library.books.length,
-                          itemBuilder: (context, index) {
-                            final book = library.books[index];
-                            return ListTile(
-                              leading: const Icon(
-                                Icons.book,
-                                color: Colors.blue,
-                              ),
-                              title: Text(
-                                book.title,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.normal,
-                                  fontFamily: 'Roboto',
-                                  letterSpacing: 0.5,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                              subtitle: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'by ${book.author}',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.normal,
-                                      fontFamily: 'Roboto',
-                                      letterSpacing: 0.5,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.surface,
-                                    ),
-                                  ),
-                                  book.available > 1
-                                      ? Text(
-                                          '${book.available} pieces',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle: FontStyle.normal,
-                                            fontFamily: 'Roboto',
-                                            letterSpacing: 0.5,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.surface,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Unavailable',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle: FontStyle.normal,
-                                            fontFamily: 'Roboto',
-                                            letterSpacing: 0.5,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                          ),
-                                        ),
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () => _addmore(book.id),
-                                    tooltip: 'Add more to Library',
-                                    icon: Icon(
-                                      Icons.add_box,
-                                      color: Colors.blue,
-                                    ),
-                                    iconSize: 30,
-                                  ),
-                                  Visibility(
-                                    visible: book.available > 1,
-                                    maintainState: true,
-                                    child: IconButton(
-                                      onPressed: () => {
-                                        _callrent(book.title, book.id),
-                                      },
-                                      tooltip: 'Rent this Book',
-                                      icon: Icon(
-                                        Icons.bookmark_add,
-                                        color: Colors.blue,
-                                      ),
-                                      iconSize: 30,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          separatorBuilder: (context, index) => const Divider(
-                            indent: 16,
-                            endIndent: 16,
-                            thickness: 1,
-                          ),
-                        ),
-                ),
-              ],
+                      ],
+                    ),
+                  );
+                },
+              );
+              return;
+            }
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined, color: Colors.blue),
+              selectedIcon: Icon(Icons.dashboard, color: Colors.blue),
+              label: 'Home',
             ),
-            Visibility(
-              visible: showAddbook,
-              maintainState: true,
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedScale(
-                  scale: showAddbook ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Addbook(
-                    onClose: () {
-                      setState(() {
-                        showAddbook = false;
-                        showFab = true;
-                      });
-                    },
-                  ),
-                ),
-              ),
+            NavigationDestination(
+              icon: Icon(Icons.book_outlined, color: Colors.blue),
+              selectedIcon: Icon(Icons.book, color: Colors.blue),
+              label: 'Books',
             ),
-            Visibility(
-              visible: showAddmore,
-              maintainState: true,
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedScale(
-                  scale: showAddmore ? 1.0 : 0,
-                  duration: Duration(milliseconds: 250),
-                  child: AddMore(
-                    onClose: () {
-                      setState(() {
-                        showAddmore = false;
-                        showFab = true;
-                      });
-                    },
-                    bookId: addbookId,
-                  ),
-                ),
-              ),
+            NavigationDestination(
+              icon: Icon(Icons.bookmark_added_outlined, color: Colors.blue),
+              selectedIcon: Icon(Icons.bookmark_added, color: Colors.blue),
+              label: 'Rentals',
             ),
-            Visibility(
-              visible: showrent,
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedScale(
-                  scale: showrent ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Rent(
-                    onClose: () {
-                      setState(() {
-                        showrent = false;
-                      });
-                    },
-                    bookId: rentbookId,
-                    bookName: rentbookName,
-                  ),
-                ),
-              ),
+            NavigationDestination(
+              icon: Icon(Icons.more_horiz, color: Colors.blue),
+              selectedIcon: Icon(Icons.more_horiz, color: Colors.blue),
+              label: 'More',
             ),
           ],
-        ),
-        floatingActionButton: IgnorePointer(
-          ignoring: !showFab,
-          child: AnimatedScale(
-            scale: showFab ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 250),
-            child: FloatingActionButton(
-              onPressed: () => _addbooks(),
-              tooltip: 'Add Books',
-              child: const Icon(
-                Icons.library_add,
-                size: 40,
-                color: Colors.blue,
-              ),
-            ),
-          ),
         ),
       ),
     );
   }
 
-  void _addbooks() {
-    setState(() {
-      showAddbook = !showAddbook;
-      showFab = !showFab;
-    });
-  }
-
-  void _addmore(int id) {
-    addbookId = id;
-    setState(() {
-      showAddmore = !showAddmore;
-      showFab = !showFab;
-    });
-  }
-
   void _opendrawer(BuildContext context) {
-    if (showAddbook) {
-      return;
-    }
     Scaffold.of(context).openEndDrawer();
-  }
-
-  void _callrent(String name, int id) {
-    setState(() {
-      rentbookId = id;
-      rentbookName = name;
-      showrent = true;
-    });
   }
 }

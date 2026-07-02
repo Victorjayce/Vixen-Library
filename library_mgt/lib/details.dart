@@ -8,14 +8,16 @@ class AuthorDetailPage extends StatefulWidget {
   const AuthorDetailPage({
     super.key,
     required this.booksId,
-    required this.authorName,
+    required this.authorId,
   });
   final List<int> booksId;
-  final String authorName;
+  final int authorId;
 
   @override
   State<AuthorDetailPage> createState() => _AuthorDetailPageState();
 }
+
+enum MenuAction { rent, addmore, edit, delete }
 
 class _AuthorDetailPageState extends State<AuthorDetailPage> {
   bool showAddmore = false;
@@ -30,6 +32,7 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
+    final author = library.getauthor(widget.authorId);
     final List<Book> authorbooks = library.authorBooks(widget.booksId);
     return Scaffold(
       body: SafeArea(
@@ -61,14 +64,14 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                           child: Icon(
                             Icons.person,
                             size: 40,
-                            color: Theme.of(context).colorScheme.surface,
+                            color: Colors.white,
                           ),
                         ),
                         Hero(
-                          tag: 'name-${widget.authorName}',
+                          tag: 'name-${author.name}',
                           transitionOnUserGestures: true,
                           child: Text(
-                            widget.authorName,
+                            author.name,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -83,10 +86,17 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[ContainerTitle(title: 'Books')],
-                ),
+                if (authorbooks.length > 1)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      ContainerTitle(
+                        title: authorbooks.length == 1
+                            ? '${authorbooks.length}Book'
+                            : '${authorbooks.length}Books',
+                      ),
+                    ],
+                  ),
                 Expanded(
                   child: widget.booksId.isEmpty
                       ? const Center(
@@ -138,7 +148,7 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                       letterSpacing: 0.5,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.surface,
+                                      ).colorScheme.onSurface,
                                     ),
                                   ),
                                   Text(
@@ -151,41 +161,83 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                       letterSpacing: 0.5,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.surface,
+                                      ).colorScheme.onSurface,
                                     ),
                                   ),
                                 ],
                               ),
-                              trailing: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () =>
-                                        _calladd(context, addbookId),
-                                    tooltip: 'Add more to Library',
-                                    icon: Icon(
-                                      Icons.add_box,
-                                      color: Colors.blue,
+                              trailing: PopupMenuButton<MenuAction>(
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    value: MenuAction.rent,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.bookmark_add,
+                                          color: Colors.blue,
+                                          size: 20,
+                                        ),
+                                        Text('Rent'),
+                                      ],
                                     ),
-                                    iconSize: 30,
                                   ),
-                                  Visibility(
-                                    visible: book.available > 0,
-                                    maintainState: true,
-                                    child: IconButton(
-                                      onPressed: () => {
-                                        _callrent(book.title, book.id),
-                                      },
-                                      tooltip: 'Rent this Book',
-                                      icon: Icon(
-                                        Icons.bookmark_add,
-                                        color: Colors.blue,
-                                      ),
-                                      iconSize: 30,
+                                  PopupMenuItem(
+                                    value: MenuAction.addmore,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.add,
+                                          color: Colors.blue,
+                                          size: 20,
+                                        ),
+                                        Text('Add more pieces'),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    value: MenuAction.edit,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.bookmark_add,
+                                          color: Colors.orange,
+                                          size: 20,
+                                        ),
+                                        Text('Edit'),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    value: MenuAction.delete,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                          size: 20,
+                                        ),
+                                        Text('Delete'),
+                                      ],
                                     ),
                                   ),
                                 ],
+                                onSelected: (action) {
+                                  switch (action) {
+                                    case MenuAction.rent:
+                                      _callrent(book.title, book.id);
+                                      break;
+                                    case MenuAction.addmore:
+                                      _calladd(context, book.id);
+                                      break;
+                                    case MenuAction.edit:
+                                      _callrent(book.title, book.id);
+                                      break;
+                                    case MenuAction.delete:
+                                      _callrent(book.title, book.id);
+                                      break;
+                                  }
+                                },
                               ),
                             );
                           },

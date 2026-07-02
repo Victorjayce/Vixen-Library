@@ -105,6 +105,8 @@ class _RentState extends State<Rent> {
                                   onChanged: (value) {
                                     setState(() {
                                       selectedBook = value!;
+                                      quantity = 1;
+                                      showdecrement = false;
                                     });
 
                                     bookId = (library.books.firstWhere(
@@ -232,7 +234,7 @@ class _RentState extends State<Rent> {
       );
       return;
     }
-    library.rentBook(bookId, quantity);
+    //library.rentBook(bookId, quantity);
     widget.onClose();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

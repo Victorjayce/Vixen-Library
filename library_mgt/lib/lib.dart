@@ -16,9 +16,31 @@ class Book {
   });
 }
 
+class User {
+  final int id;
+  String name;
+  final List<int> rentId;
+
+  User({required this.id, required this.name, required this.rentId});
+}
+
+class Rental {
+  final int id;
+  final int bookid;
+  final int userid;
+  final int quantity;
+
+  Rental({
+    required this.id,
+    required this.bookid,
+    required this.userid,
+    required this.quantity,
+  });
+}
+
 class Author {
   final int id;
-  final String name;
+  String name;
   final List<int> booksId;
 
   Author({required this.id, required this.name, required this.booksId});
@@ -26,9 +48,15 @@ class Author {
 
 class AuthorDetailArgs {
   final List<int> booksId;
-  final String name;
+  final int authorId;
 
-  AuthorDetailArgs({required this.booksId, required this.name});
+  AuthorDetailArgs({required this.booksId, required this.authorId});
+}
+
+class UserDetailsArgs {
+  final List<int> rentalsId;
+  final String userName;
+  UserDetailsArgs({required this.rentalsId, required this.userName});
 }
 
 class Library extends ChangeNotifier {
@@ -199,14 +227,30 @@ class Library extends ChangeNotifier {
     Author(id: 10, name: 'Harry Simpson', booksId: []),
   ];
 
+  final List<User> _users = [
+    User(id: 1, name: 'Victor Mart', rentId: [1, 2, 3]),
+    User(id: 2, name: 'Jerry Miah', rentId: [9, 7, 8]),
+    User(id: 3, name: 'Merl Ancah', rentId: [4, 5, 6]),
+  ];
+
+  final List<Rental> _rented = [
+    Rental(id: 1, bookid: 20, userid: 2, quantity: 3),
+    Rental(id: 2, bookid: 7, userid: 2, quantity: 1),
+    Rental(id: 3, bookid: 14, userid: 3, quantity: 4),
+    Rental(id: 4, bookid: 18, userid: 1, quantity: 5),
+  ];
+
   List<Book> get books => List.unmodifiable(_books);
+  List<User> get users => List.unmodifiable(_users);
+  List<Rental> get rent => List.unmodifiable(_rented);
   List<Author> get authors => List.unmodifiable(_authors);
   List<String> get authorNames =>
       _authors.map((author) => author.name).toList();
   List<String> get bookNames => _books.map((book) => book.title).toList();
   List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
 
-  void addBook(String title, String author, int quantity) {
+  bool addBook(String title, String author, int quantity) {
+    if (_books.any((b) => b.title == title)) return false;
     final newBook = Book(
       id: _books.length + 1,
       title: title,
@@ -222,6 +266,16 @@ class Library extends ChangeNotifier {
     abook.booksId.add(newBook.id);
     _books.add(newBook);
     notifyListeners();
+    return true;
+  }
+
+  bool addUser(String name) {
+    if (_users.any((u) => u.name == name)) return false;
+
+    final newUser = User(id: _users.length++, name: name, rentId: []);
+    _users.add(newUser);
+    notifyListeners();
+    return true;
   }
 
   void addMore(int id, int quantity) {
@@ -238,7 +292,7 @@ class Library extends ChangeNotifier {
     return _books.where((book) => ids.contains(book.id)).toList();
   }
 
-  void rentBook(int bookId, int amount) {
+  void rentBook(int bookId, int amount, int userId) {
     if (_books.isEmpty) {
       return;
     }
@@ -247,28 +301,42 @@ class Library extends ChangeNotifier {
       (b) => b.id == bookId,
       orElse: () => throw StateError('Book not found'),
     );
+    final user = _users.firstWhere((u) => u.id == userId);
 
     if (book.available >= amount) {
       book.available -= amount;
       book.rented += amount;
+      final newrental = Rental(
+        id: _rented.length++,
+        bookid: bookId,
+        userid: userId,
+        quantity: amount,
+      );
+      _rented.add(newrental);
+      user.rentId.add(newrental.id);
       notifyListeners();
     }
   }
 
-  void returnBook(int bookId, int amount) {
-    if (rented.isEmpty) return;
+  void returnBook(int rentId, int amount, int userId) {
+    if (rented.isEmpty || _rented.isEmpty) return;
+    final rental = _rented.firstWhere((r) => r.id == rentId);
     final book = _books.firstWhere(
-      (b) => b.id == bookId,
+      (b) => b.id == rental.bookid,
       orElse: () => throw StateError('Book not found'),
     );
-    if (book.rented >= amount) {
+    final user = _users.firstWhere((u) => u.id == userId);
+    if (book.rented >= amount && rental.quantity >= amount) {
       book.rented -= amount;
       book.available += amount;
+      _rented.remove(rental);
+      user.rentId.remove(rentId);
       notifyListeners();
     }
   }
 
-  void addAuthor(String name, List<int> booksId) {
+  bool addAuthor(String name, List<int> booksId) {
+    if (_authors.any((a) => a.name == name)) return false;
     final newAuthor = Author(
       id: _authors.length + 1,
       name: name,
@@ -276,6 +344,67 @@ class Library extends ChangeNotifier {
     );
     _authors.add(newAuthor);
     notifyListeners();
+    return true;
+  }
+
+  bool editAuthor(String oldname, int id, String newname) {
+    if (!_authors.any((a) => a.name == oldname) ||
+        _authors.any((a) => a.name == newname)) {
+      return false;
+    }
+    final author = _authors.firstWhere((a) => a.id == id);
+    author.name = newname;
+    notifyListeners();
+    return true;
+  }
+
+  bool editUser(String oldname, int id, String newname) {
+    if (!_users.any((a) => a.name == oldname) ||
+        _users.any((a) => a.name == newname)) {
+      return false;
+    }
+    final user = _users.firstWhere((a) => a.id == id);
+    user.name = newname;
+    notifyListeners();
+    return true;
+  }
+
+  bool deleteAuthor(int id) {
+    final author = _authors.firstWhere((a) => a.id == id);
+    if (author.booksId.isNotEmpty) return false;
+    _authors.remove(author);
+    notifyListeners();
+    return true;
+  }
+
+  bool deleteUser(int id) {
+    final user = _users.firstWhere((a) => a.id == id);
+    if (user.rentId.isNotEmpty) return false;
+    _users.remove(user);
+    notifyListeners();
+    return true;
+  }
+
+  void deleteBook(int id) {
+    final book = _books.firstWhere((a) => a.id == id);
+    _books.remove(book);
+    notifyListeners();
+  }
+
+  Author getauthor(int id) {
+    return _authors.firstWhere((a) => a.id == id);
+  }
+
+  Book getbook(int id) {
+    return _books.firstWhere((a) => a.id == id);
+  }
+
+  User getuser(int id) {
+    return _users.firstWhere((u) => u.id == id);
+  }
+
+  Rental getrental(int id) {
+    return _rented.firstWhere((r) => r.id == id);
   }
 }
 

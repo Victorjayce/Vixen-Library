@@ -69,7 +69,11 @@ Route<dynamic>? _routes(RouteSettings settings) {
     case authorRoute:
       return MaterialPageRoute(builder: (_) => const AuthorPage());
     case userdetailsRoute:
-      return MaterialPageRoute(builder: (_) => const UserDetail());
+      final args = settings.arguments;
+      if (args is User) {
+        return MaterialPageRoute(builder: (_) => UserDetail(user: args));
+      }
+      return _errorRoute();
     case userRoute:
       return MaterialPageRoute(builder: (_) => const UserPage());
     case detailsRoute:

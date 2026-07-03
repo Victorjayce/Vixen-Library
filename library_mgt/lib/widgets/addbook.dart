@@ -4,15 +4,28 @@ import 'package:library_mgt/lib.dart';
 import 'addauthor.dart';
 
 class Addbook extends StatefulWidget {
-  const Addbook({super.key, required this.onClose});
-  final VoidCallback onClose;
+  const Addbook({super.key, this.author = ''});
+  final String author;
   @override
   State<Addbook> createState() => _AddbookState();
 }
 
+Future<String?> showAddBook(BuildContext context) {
+  return showModalBottomSheet<String>(
+    context: context,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    clipBehavior: Clip.antiAlias,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (_) => Addbook(),
+  );
+}
+
+String newAuthor = '';
+
 class _AddbookState extends State<Addbook> {
   bool showAddauthor = false;
-  String newauthorname = '';
   final TextEditingController _booknamecontroller = TextEditingController();
   int quantity = 5;
   String selectedAuthor = '';
@@ -22,12 +35,23 @@ class _AddbookState extends State<Addbook> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (selectedAuthor.isEmpty) {
+    if (widget.author.isEmpty) {
       final lib = LibraryProvider.of(context);
       selectedAuthor = lib.authorNames.isNotEmpty
           ? lib.authorNames.first
           : addnew;
+    } else {
+      selectedAuthor = widget.author;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _booknamecontroller.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -184,7 +208,7 @@ class _AddbookState extends State<Addbook> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                          onPressed: widget.onClose,
+                          onPressed: () => {Navigator.pop(context)},
                           icon: const Icon(
                             Icons.close,
                             color: Colors.red,
@@ -193,14 +217,22 @@ class _AddbookState extends State<Addbook> {
                           tooltip: 'Cancel',
                         ),
                         SizedBox(width: 40),
-                        IconButton(
-                          onPressed: () => _saveBook(context),
-                          icon: const Icon(
-                            Icons.check,
-                            color: Colors.green,
-                            size: 50,
+                        AnimatedScale(
+                          scale:
+                              _booknamecontroller.text.trim().isNotEmpty &&
+                                  selectedAuthor.isNotEmpty
+                              ? 1.0
+                              : 0.0,
+                          duration: const Duration(milliseconds: 150),
+                          child: IconButton(
+                            onPressed: () => _saveBook(context),
+                            icon: const Icon(
+                              Icons.check,
+                              color: Colors.green,
+                              size: 50,
+                            ),
+                            tooltip: 'Save',
                           ),
-                          tooltip: 'Save',
                         ),
                       ],
                     ),
@@ -219,6 +251,7 @@ class _AddbookState extends State<Addbook> {
     if (newAuthorName != null && newAuthorName.isNotEmpty) {
       setState(() {
         selectedAuthor = newAuthorName;
+        newAuthor = newAuthorName;
       });
     } else {
       setState(() {
@@ -233,29 +266,12 @@ class _AddbookState extends State<Addbook> {
     final bookName = _booknamecontroller.text.trim();
     if (bookName.isNotEmpty && selectedAuthor.isNotEmpty) {
       LibraryProvider.of(context).addBook(bookName, selectedAuthor, quantity);
-      _booknamecontroller.clear();
-      setState(() {
-        selectedAuthor = '';
-        quantity = 0;
-      });
-      widget.onClose();
+      Navigator.pop(context, bookName);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Book: \'$bookName\'      added to library'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.blue.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          margin: EdgeInsets.all(16),
-          duration: Duration(seconds: 2),
-          showCloseIcon: true,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Enter Required details before saving'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.red,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           margin: EdgeInsets.all(16),
           duration: Duration(seconds: 2),

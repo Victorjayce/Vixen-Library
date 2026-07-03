@@ -50,7 +50,7 @@ class _AuthorPageState extends State<AuthorPage> {
               children: [
                 IconButton(
                   onPressed: () => _callAddAuthorDialog(context),
-                  tooltip: 'Add Book',
+                  tooltip: 'Add Author',
                   iconSize: 40,
                   color: Colors.blue,
                   icon: const Icon(Icons.add),

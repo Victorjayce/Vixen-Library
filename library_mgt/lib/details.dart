@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'widgets/containertitle.dart';
 import 'lib.dart';
-import 'dart:ui' as ui;
 import 'widgets/rent.dart';
 import 'widgets/addmore.dart';
+import 'widgets/addbook.dart';
 
 class AuthorDetailPage extends StatefulWidget {
   const AuthorDetailPage({
@@ -74,17 +74,34 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                 ),
               ],
             ),
-            if (authorbooks.length > 1)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  ContainerTitle(
-                    title: authorbooks.length == 1
-                        ? '${authorbooks.length}Book'
-                        : '${authorbooks.length}Books',
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Visibility(
+                    visible: authorbooks.isNotEmpty,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        ContainerTitle(
+                          title: authorbooks.length == 1
+                              ? '${authorbooks.length}Book'
+                              : '${authorbooks.length}Books',
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => _calladdbook(context),
+                    tooltip: 'Add Book',
+                    iconSize: 40,
+                    color: Colors.blue,
+                    icon: const Icon(Icons.add),
                   ),
                 ],
               ),
+            ),
             Expanded(
               child: widget.booksId.isEmpty
                   ? const Center(
@@ -238,34 +255,22 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     );
   }
 
-  void _addbooks(BuildContext context) {
-    if (addbookId == 0) return;
-    LibraryProvider.of(context).addMore(addbookId, quantity);
-    quantity = 1;
-    setState(() {
-      showAddmore = false;
-      addbookId = 0;
-      showdecrement = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Books added to library'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.blue.withValues(alpha: 0.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: EdgeInsets.all(16),
-        duration: Duration(seconds: 2),
-        showCloseIcon: true,
-      ),
-    );
-  }
-
-  void _close() {
-    setState(() {
-      showAddmore = false;
-      quantity = 1;
-      addbookId = 0;
-    });
+  Future<void> _calladdbook(BuildContext context) async {
+    String? bookName = await showAddBook(context);
+    if (!context.mounted) return;
+    if (bookName != null && bookName.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Book: \'$bookName\'      added to library'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 
   Future<void> _calladdmore(int id, BuildContext context) async {
@@ -288,30 +293,6 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     }
   }
 
-  void _increment() {
-    if (quantity == 1) {
-      setState(() {
-        quantity++;
-        showdecrement = true;
-      });
-    } else {
-      setState(() {
-        quantity++;
-      });
-    }
-  }
-
-  void _decrement() {
-    if (quantity <= 1) return;
-
-    setState(() {
-      quantity--;
-      if (quantity == 1) {
-        showdecrement = false;
-      }
-    });
-  }
-
   Future<void> _callrent(String name, int id) async {
     int? result = await showRentsheet(context, bookName: name, bookId: id);
     if (result != 0 && result != null) {
@@ -330,10 +311,5 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
         ),
       );
     }
-    setState(() {
-      rentbookId = id;
-      rentbookName = name;
-      showrent = true;
-    });
   }
 }

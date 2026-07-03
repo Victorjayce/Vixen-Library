@@ -251,7 +251,9 @@ class Library extends ChangeNotifier {
   List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
 
   bool addBook(String title, String author, int quantity) {
-    if (_books.any((b) => b.title == title)) return false;
+    if (_books.any((b) => b.title.toLowerCase() == title.toLowerCase())) {
+      return false;
+    }
     final newBook = Book(
       id: _books.length + 1,
       title: title,
@@ -260,7 +262,7 @@ class Library extends ChangeNotifier {
     );
 
     final abook = _authors.firstWhere(
-      (a) => a.name == author,
+      (a) => a.name.toLowerCase() == author.toLowerCase(),
       orElse: () => throw StateError('Author not found'),
     );
 
@@ -271,10 +273,22 @@ class Library extends ChangeNotifier {
   }
 
   bool addUser(String name) {
-    if (_users.any((u) => u.name == name)) return false;
+    if (_users.any((u) => u.name.toLowerCase() == name.toLowerCase())) {
+      return false;
+    }
 
     final newUser = User(id: _users.length++, name: name, rentId: []);
     _users.add(newUser);
+    notifyListeners();
+    return true;
+  }
+
+  bool updateUser(int id, String newname) {
+    if (_users.any((u) => u.name.toLowerCase() == newname.toLowerCase())) {
+      return false;
+    }
+    final user = _users.firstWhere((u) => u.id == id);
+    user.name = newname;
     notifyListeners();
     return true;
   }
@@ -341,13 +355,25 @@ class Library extends ChangeNotifier {
   }
 
   bool addAuthor(String name, List<int> booksId) {
-    if (_authors.any((a) => a.name == name)) return false;
+    if (_authors.any((a) => a.name.toLowerCase() == name.toLowerCase())) {
+      return false;
+    }
     final newAuthor = Author(
       id: _authors.length + 1,
       name: name,
       booksId: booksId,
     );
     _authors.add(newAuthor);
+    notifyListeners();
+    return true;
+  }
+
+  bool updateAuthor(int id, String newname) {
+    if (_authors.any((a) => a.name.toLowerCase() == newname.toLowerCase())) {
+      return false;
+    }
+    final author = _authors.firstWhere((a) => a.id == id);
+    author.name = newname;
     notifyListeners();
     return true;
   }

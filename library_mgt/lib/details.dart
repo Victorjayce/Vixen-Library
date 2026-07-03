@@ -4,6 +4,7 @@ import 'lib.dart';
 import 'widgets/rent.dart';
 import 'widgets/addmore.dart';
 import 'widgets/addbook.dart';
+import 'widgets/addauthor.dart';
 
 class AuthorDetailPage extends StatefulWidget {
   const AuthorDetailPage({
@@ -55,20 +56,38 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                       backgroundImage: null,
                       child: Icon(Icons.person, size: 40, color: Colors.white),
                     ),
-                    Hero(
-                      tag: 'name-${author.name}',
-                      transitionOnUserGestures: true,
-                      child: Text(
-                        author.name,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.normal,
-                          fontFamily: 'Roboto',
-                          letterSpacing: 0.5,
-                          color: Colors.blue,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Hero(
+                          tag: 'name-${author.name}',
+                          transitionOnUserGestures: true,
+                          child: Text(
+                            author.name,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.normal,
+                              fontFamily: 'Roboto',
+                              letterSpacing: 0.5,
+                              color: Colors.blue,
+                            ),
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 10),
+                        IconButton(
+                          onPressed: () => {
+                            _calleditAuthorDialog(
+                              context,
+                              author.name,
+                              author.id,
+                            ),
+                          },
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          iconSize: 25,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -237,6 +256,32 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
         ),
       ),
     );
+  }
+
+  void _calleditAuthorDialog(
+    BuildContext context,
+    String authorName,
+    int id,
+  ) async {
+    final newAuthorName = await showAddAuthor(
+      context,
+      authorName: authorName,
+      id: id,
+    );
+    if (!context.mounted) return;
+    if (newAuthorName != null && newAuthorName.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Name updated to \'$newAuthorName\''),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 
   Future<void> _calladdbook(BuildContext context) async {

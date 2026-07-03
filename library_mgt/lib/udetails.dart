@@ -3,6 +3,7 @@ import 'lib.dart';
 import 'widgets/containertitle.dart';
 import 'widgets/return.dart';
 import 'widgets/rent.dart';
+import 'widgets/adduser.dart';
 
 class UserDetail extends StatefulWidget {
   const UserDetail({super.key, required this.user});
@@ -41,20 +42,38 @@ class _UserDetailState extends State<UserDetail> {
                         color: Colors.white,
                       ),
                     ),
-                    Hero(
-                      tag: 'name-${widget.user.name}',
-                      transitionOnUserGestures: true,
-                      child: Text(
-                        widget.user.name,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.normal,
-                          fontFamily: 'Roboto',
-                          letterSpacing: 0.5,
-                          color: Colors.blue,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Hero(
+                          tag: 'name-${widget.user.name}',
+                          transitionOnUserGestures: true,
+                          child: Text(
+                            widget.user.name,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.normal,
+                              fontFamily: 'Roboto',
+                              letterSpacing: 0.5,
+                              color: Colors.blue,
+                            ),
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 10),
+                        IconButton(
+                          onPressed: () => {
+                            _calleditUserDialog(
+                              context,
+                              widget.user.name,
+                              widget.user.id,
+                            ),
+                          },
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          iconSize: 25,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -176,6 +195,28 @@ class _UserDetailState extends State<UserDetail> {
         ),
       ),
     );
+  }
+
+  void _calleditUserDialog(
+    BuildContext context,
+    String userName,
+    int id,
+  ) async {
+    final newUserName = await showAddUser(context, userName: userName, id: id);
+    if (!context.mounted) return;
+    if (newUserName != null && newUserName.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Name updated to \'$newUserName\''),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 
   Future<void> callreturnsheet(BuildContext context, Rental rental) async {

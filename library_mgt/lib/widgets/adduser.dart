@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'containertitle.dart';
 import 'package:library_mgt/lib.dart';
 
-class Addauthor extends StatefulWidget {
-  const Addauthor({super.key, this.authorName = '', this.id = 0});
-  final String authorName;
+class Adduser extends StatefulWidget {
+  const Adduser({super.key, this.userName = '', this.id = 0});
+  final String userName;
   final int id;
 
   @override
-  State<Addauthor> createState() => _AddauthorState();
+  State<Adduser> createState() => _AdduserState();
 }
 
-Future<String?> showAddAuthor(
+Future<String?> showAddUser(
   BuildContext context, {
-  String authorName = '',
+  String userName = '',
   int id = 0,
 }) {
   return showDialog<String>(
@@ -24,18 +24,18 @@ Future<String?> showAddAuthor(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: Addauthor(authorName: authorName, id: id),
+      child: Adduser(userName: userName, id: id),
     ),
   );
 }
 
-class _AddauthorState extends State<Addauthor> {
-  final TextEditingController _authornamecontroller = TextEditingController();
+class _AdduserState extends State<Adduser> {
+  final TextEditingController _usernamecontroller = TextEditingController();
   @override
   void initState() {
     super.initState();
 
-    _authornamecontroller.addListener(() {
+    _usernamecontroller.addListener(() {
       setState(() {});
     });
   }
@@ -43,7 +43,7 @@ class _AddauthorState extends State<Addauthor> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authornamecontroller.text = widget.authorName;
+    _usernamecontroller.text = widget.userName;
   }
 
   @override
@@ -66,7 +66,7 @@ class _AddauthorState extends State<Addauthor> {
               children: <Widget>[ContainerTitle(title: 'New Author')],
             ),
             TextField(
-              controller: _authornamecontroller,
+              controller: _usernamecontroller,
               decoration: InputDecoration(
                 labelText: 'Author Name',
                 border: OutlineInputBorder(
@@ -87,12 +87,10 @@ class _AddauthorState extends State<Addauthor> {
                 ),
                 SizedBox(width: 40),
                 AnimatedScale(
-                  scale: _authornamecontroller.text.trim().isNotEmpty
-                      ? 1.0
-                      : 0.0,
+                  scale: _usernamecontroller.text.trim().isNotEmpty ? 1.0 : 0.0,
                   duration: Duration(milliseconds: 150),
                   child: IconButton(
-                    onPressed: () => _savenewauthor(context),
+                    onPressed: () => _savenewuser(context),
                     icon: Icon(Icons.check, color: Colors.green),
                     iconSize: 40,
                     color: Colors.blue,
@@ -106,17 +104,17 @@ class _AddauthorState extends State<Addauthor> {
     );
   }
 
-  Future<void> _savenewauthor(BuildContext context) async {
+  Future<void> _savenewuser(BuildContext context) async {
     if (widget.id != 0) {
       bool add = LibraryProvider.of(
         context,
-      ).updateAuthor(widget.id, _authornamecontroller.text.trim());
+      ).updateUser(widget.id, _usernamecontroller.text.trim());
       if (!add) {
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
             icon: Icon(Icons.error, color: Colors.red),
-            title: const Text("Author already exists in Library"),
+            title: const Text("User already exists in Library"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -128,10 +126,8 @@ class _AddauthorState extends State<Addauthor> {
         return;
       }
     } else {
-      LibraryProvider.of(
-        context,
-      ).addAuthor(_authornamecontroller.text.trim(), []);
+      LibraryProvider.of(context).addUser(_usernamecontroller.text.trim());
     }
-    Navigator.pop(context, _authornamecontroller.text.trim());
+    Navigator.pop(context, _usernamecontroller.text.trim());
   }
 }

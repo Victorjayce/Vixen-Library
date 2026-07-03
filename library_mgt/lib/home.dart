@@ -58,8 +58,9 @@ class _HomeState extends State<Home> {
                   text:
                       'Vixen library is a simple library management system built by ',
                 ),
+                const TextSpan(text: 'Nkegbu Ebubechukwu Victor  '),
                 TextSpan(
-                  text: 'Nkegbu Ebubechukwu Victor @victorjayce',
+                  text: '@victorjayce',
                   style: TextStyle(
                     color: scheme.primary,
                     fontWeight: FontWeight.w700,
@@ -383,8 +384,8 @@ class _HomeState extends State<Home> {
               label: 'Home',
             ),
             NavigationDestination(
-              icon: Icon(Icons.book_outlined, color: Colors.blue),
-              selectedIcon: Icon(Icons.book, color: Colors.blue),
+              icon: Icon(Icons.auto_stories_outlined, color: Colors.blue),
+              selectedIcon: Icon(Icons.auto_stories, color: Colors.blue),
               label: 'Books',
             ),
             NavigationDestination(

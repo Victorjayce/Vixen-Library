@@ -30,30 +30,70 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     super.build(context);
     final library = LibraryProvider.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16.0),
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [scheme.primary, scheme.inversePrimary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.primary.withValues(alpha: 0.18),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${library.books.length} Books In Library',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.normal,
-                  fontFamily: 'Roboto',
-                  letterSpacing: 0.5,
-                  color: Theme.of(context).colorScheme.onSurface,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: scheme.surface.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.auto_stories_rounded,
+                  color: scheme.onPrimary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Library catalog',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: scheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${library.books.length} books available in the library',
+                      style: TextStyle(
+                        color: scheme.onPrimary.withValues(alpha: 0.9),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               IconButton(
                 onPressed: () => _calladdbook(context),
                 tooltip: 'Add Book',
-                iconSize: 40,
-                color: Colors.blue,
+                iconSize: 34,
+                color: scheme.onPrimary,
                 icon: const Icon(Icons.add),
               ),
             ],
@@ -68,115 +108,148 @@ class _HomePageState extends State<HomePage>
                   ),
                 )
               : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: library.books.length,
                   itemBuilder: (context, index) {
                     final book = library.books[index];
-                    return ListTile(
-                      leading: const Icon(Icons.book, color: Colors.blue),
-                      title: Text(
-                        book.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.normal,
-                          fontFamily: 'Roboto',
-                          letterSpacing: 0.5,
-                          color: Colors.blue,
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest.withValues(
+                          alpha: 0.45,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: scheme.outlineVariant.withValues(alpha: 0.35),
                         ),
                       ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.min,
+                      child: Row(
                         children: [
-                          Text(
-                            'by ${book.author}',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.normal,
-                              fontStyle: FontStyle.normal,
-                              fontFamily: 'Roboto',
-                              letterSpacing: 0.5,
-                              color: Theme.of(context).colorScheme.onSurface,
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.menu_book_rounded,
+                              color: Colors.blue,
                             ),
                           ),
-                          book.available > 1
-                              ? Text(
-                                  '${book.available} pieces',
-                                  style: TextStyle(
-                                    fontSize: 15,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  book.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.normal,
-                                    fontFamily: 'Roboto',
-                                    letterSpacing: 0.5,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                )
-                              : Text(
-                                  'Unavailable',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.normal,
-                                    fontFamily: 'Roboto',
-                                    letterSpacing: 0.5,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
+                                    color: Colors.blue,
                                   ),
                                 ),
-                        ],
-                      ),
-                      trailing: PopupMenuButton<MenuAction>(
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: MenuAction.rent,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.bookmark_add,
-                                  color: Colors.blue,
-                                  size: 20,
+                                const SizedBox(height: 4),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 4,
+                                  children: [
+                                    Text(
+                                      'by ${book.author}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    Text(
+                                      book.available > 1
+                                          ? '${book.available} pieces'
+                                          : 'Unavailable',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text('Rent'),
                               ],
                             ),
                           ),
-                          PopupMenuItem(
-                            value: MenuAction.addmore,
-                            child: Row(
-                              children: [
-                                Icon(Icons.add, color: Colors.blue, size: 20),
-                                Text('Add more pieces'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: MenuAction.delete,
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, color: Colors.red, size: 20),
-                                Text('Delete'),
-                              ],
-                            ),
+                          PopupMenuButton<MenuAction>(
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: MenuAction.rent,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.bookmark_add,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    ),
+                                    Text('Rent'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: MenuAction.addmore,
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.add,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    ),
+                                    Text('Add more pieces'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: MenuAction.delete,
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    Text('Delete'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            onSelected: (action) {
+                              switch (action) {
+                                case MenuAction.rent:
+                                  _callrent(book.title, book.id);
+                                  break;
+                                case MenuAction.addmore:
+                                  _calladdmore(book.id, context);
+                                  break;
+                                case MenuAction.delete:
+                                  _calldelete(
+                                    context,
+                                    book.title,
+                                    book.id,
+                                    book.available,
+                                  );
+                                  break;
+                              }
+                            },
                           ),
                         ],
-                        onSelected: (action) {
-                          switch (action) {
-                            case MenuAction.rent:
-                              _callrent(book.title, book.id);
-                              break;
-                            case MenuAction.addmore:
-                              _calladdmore(book.id, context);
-                              break;
-                            case MenuAction.delete:
-                              _calldelete(context, book.title, book.id);
-                              break;
-                          }
-                        },
                       ),
                     );
                   },
@@ -192,6 +265,7 @@ class _HomePageState extends State<HomePage>
     BuildContext context,
     String bookname,
     int bookId,
+    int available,
   ) async {
     final delete = await showDialog<bool>(
       context: context,
@@ -218,7 +292,7 @@ class _HomePageState extends State<HomePage>
           icon: const Icon(Icons.delete_outline, color: Colors.red, size: 40),
           title: Text('Delete $bookname'),
           content: Text(
-            'You are about to permanently delete $bookname\nwould you like to continue',
+            'You are about to permanently delete $bookname  and all $available copies\nwould you like to continue',
           ),
           actions: [
             TextButton(

@@ -1,9 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:library_mgt/dashboard.dart';
 import 'package:library_mgt/book.dart';
 import 'package:library_mgt/rented.dart';
 import 'widgets/containertitle.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,8 +24,94 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
+  Future<void> _showAboutDialog(BuildContext context) async {
+    final scheme = Theme.of(context).colorScheme;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: scheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          icon: CircleAvatar(
+            backgroundColor: scheme.primaryContainer,
+            child: Icon(Icons.info_outline, color: scheme.primary),
+          ),
+          title: Text(
+            'About',
+            style: TextStyle(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                color: scheme.onSurface,
+                height: 1.6,
+                fontSize: 14,
+              ),
+              children: [
+                const TextSpan(
+                  text:
+                      'Vixen library is a simple library management system built by ',
+                ),
+                TextSpan(
+                  text: 'Nkegbu Ebubechukwu Victor @victorjayce',
+                  style: TextStyle(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () async {
+                      Navigator.pop(context);
+                      await _launchRepository();
+                    },
+                ),
+                const TextSpan(
+                  text:
+                      ', while learning dart and flutter to practice and gain experience.',
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () async {
+                Navigator.pop(context);
+                await _launchRepository();
+              },
+              icon: Icon(Icons.open_in_new, color: scheme.primary),
+              label: Text(
+                'Open GitHub repo',
+                style: TextStyle(color: scheme.primary),
+              ),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _launchRepository() async {
+    final Uri url = Uri.parse('https://github.com/Victorjayce/Vixen-Library');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open the repository link.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -75,16 +163,68 @@ class _HomeState extends State<Home> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: const Text('Vixen Library'),
+          toolbarHeight: 72,
+          backgroundColor: Colors.transparent,
+          foregroundColor: scheme.onPrimary,
+          elevation: 0,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+          ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [scheme.primary, scheme.inversePrimary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(22),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: scheme.primary.withValues(alpha: 0.18),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Vixen Library',
+                style: TextStyle(
+                  color: scheme.onPrimary,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Library management system',
+                style: TextStyle(
+                  color: scheme.onPrimary.withValues(alpha: 0.85),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
           automaticallyImplyLeading: false,
           actions: [
-            Builder(
-              builder: (context) => IconButton(
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: IconButton(
+                tooltip: 'About',
                 icon: const Icon(Icons.info_outline),
-                color: Theme.of(context).colorScheme.surface,
-                iconSize: 40,
-                onPressed: () => _opendrawer(context),
+                color: scheme.onPrimary,
+                iconSize: 26,
+                style: IconButton.styleFrom(
+                  backgroundColor: scheme.surface.withValues(alpha: 0.18),
+                ),
+                onPressed: () => _showAboutDialog(context),
               ),
             ),
           ],
@@ -261,9 +401,5 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  void _opendrawer(BuildContext context) {
-    Scaffold.of(context).openEndDrawer();
   }
 }

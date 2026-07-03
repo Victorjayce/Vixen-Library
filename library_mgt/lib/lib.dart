@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class Book {
   final int id;
@@ -14,6 +14,53 @@ class Book {
     required this.available,
     this.rented = 0,
   });
+}
+
+class ActivityItem {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final DateTime timestamp;
+
+  ActivityItem({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.timestamp,
+  });
+}
+
+class StatItem {
+  final String title;
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  StatItem({
+    required this.title,
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+}
+
+enum ActivityEnum {
+  newBook(Icons.auto_stories_rounded, 'New book added'),
+  bookReturned(Icons.restart_alt_rounded, 'Book returned'),
+  userRegistered(Icons.person_add_alt_rounded, 'User registered'),
+  authorAdded(Icons.person_add_alt_rounded, 'Author added'),
+  userDeleted(Icons.person_remove_alt_1_rounded, 'User deleted'),
+  authorDeleted(Icons.person_remove_alt_1_rounded, 'Author deleted'),
+  newPieces(Icons.my_library_add_rounded, 'New pieces added'),
+  bookDeleted(Icons.delete_outline, 'Book deleted'),
+  authorEdited(Icons.edit, 'Author edited'),
+  userEdited(Icons.edit, 'User edited');
+
+  final IconData icon;
+  final String title;
+  const ActivityEnum(this.icon, this.title);
 }
 
 class User {
@@ -245,6 +292,56 @@ class Library extends ChangeNotifier {
     Rental(id: 9, bookid: 10, userid: 2, quantity: 3),
   ];
 
+  final List<ActivityItem> activities = [
+    ActivityItem(
+      title: 'New book added',
+      subtitle: 'The Hobbit',
+      icon: Icons.auto_stories_rounded,
+      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+    ),
+    ActivityItem(
+      title: 'Book returned',
+      subtitle: 'Atomic Habits',
+      icon: Icons.restart_alt_rounded,
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    ActivityItem(
+      title: 'User registered',
+      subtitle: 'Amina joined the library',
+      icon: Icons.person_add_alt_rounded,
+      timestamp: DateTime.now(),
+    ),
+  ];
+  final List<StatItem> stats = [
+    StatItem(
+      title: 'Books',
+      icon: Icons.menu_book_rounded,
+      label: 'Books',
+      value: '128',
+      color: Colors.blueAccent,
+    ),
+    StatItem(
+      title: 'Authors',
+      icon: Icons.person_rounded,
+      label: 'Authors',
+      value: '24',
+      color: Colors.cyan,
+    ),
+    StatItem(
+      title: 'Users',
+      icon: Icons.people_alt_rounded,
+      label: 'Users',
+      value: '56',
+      color: Colors.indigo,
+    ),
+    StatItem(
+      title: 'Rented',
+      icon: Icons.bookmark_added_rounded,
+      label: 'Rented',
+      value: '18',
+      color: Colors.teal,
+    ),
+  ];
   List<Book> get books => List.unmodifiable(_books);
   List<User> get users => List.unmodifiable(_users);
   List<Rental> get rentals => List.unmodifiable(_rented);
@@ -254,6 +351,20 @@ class Library extends ChangeNotifier {
   List<String> get bookNames => _books.map((book) => book.title).toList();
   List<String> get userNames => _users.map((u) => u.name).toList();
   List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
+  List<ActivityItem> get recentActivities =>
+      List.unmodifiable(activities.reversed.toList());
+  List<StatItem> get statsList => List.unmodifiable(stats);
+
+  void addActivity(ActivityEnum activityEnum, DateTime timestamp) {
+    final activity = ActivityItem(
+      title: activityEnum.title,
+      subtitle: '',
+      icon: activityEnum.icon,
+      timestamp: timestamp,
+    );
+    activities.add(activity);
+    notifyListeners();
+  }
 
   bool addBook(String title, String author, int quantity) {
     if (_books.any((b) => b.title.toLowerCase() == title.toLowerCase())) {
@@ -282,7 +393,7 @@ class Library extends ChangeNotifier {
       return false;
     }
 
-    final newUser = User(id: _users.length++, name: name, rentId: []);
+    final newUser = User(id: _users.length + 1, name: name, rentId: []);
     _users.add(newUser);
     notifyListeners();
     return true;

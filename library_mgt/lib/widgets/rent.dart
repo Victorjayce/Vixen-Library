@@ -83,12 +83,18 @@ class _RentState extends State<Rent> {
       selectedBook = libbooks.first.title;
       bookId = libbooks.first.id;
       bookchangeable = true;
+    } else {
+      selectedBook = widget.bookName;
+      bookId = widget.bookId;
     }
     final libuser = LibraryProvider.of(context).users;
     if (widget.userName.isEmpty && libuser.isNotEmpty) {
       selectedUser = libuser.first.name;
       userId = libuser.first.id;
       userchangeable = true;
+    } else {
+      selectedUser = widget.userName;
+      userId = widget.userId;
     }
   }
 

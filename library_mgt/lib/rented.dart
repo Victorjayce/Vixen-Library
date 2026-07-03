@@ -18,118 +18,193 @@ class _RentedPageState extends State<RentedPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final rented = LibraryProvider.of(context).rented;
-    final rentals = LibraryProvider.of(context).rentals;
-    return Stack(
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: rented.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No books available yet.',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Theme.of(context).colorScheme.onSurface,
+    final library = LibraryProvider.of(context);
+    final rented = library.rented;
+    final rentals = library.rentals;
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [scheme.primary, scheme.inversePrimary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.primary.withValues(alpha: 0.18),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: scheme.surface.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.bookmark_added_rounded,
+                  color: scheme.onPrimary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rental activity',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: scheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${rentals.length} active rentals in the library',
+                      style: TextStyle(
+                        color: scheme.onPrimary.withValues(alpha: 0.9),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: rented.isEmpty
+              ? Center(
+                  child: Text(
+                    'No books available yet.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: rentals.length,
+                  itemBuilder: (context, index) {
+                    final rental = rentals[index];
+                    final book = library.getbook(rental.bookid);
+                    final user = library.getuser(rental.userid);
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest.withValues(
+                          alpha: 0.45,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: scheme.outlineVariant.withValues(alpha: 0.35),
                         ),
                       ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: rentals.length,
-                      itemBuilder: (context, index) {
-                        final rental = rentals[index];
-                        final book = library.getbook(rental.bookid);
-                        final user = library.getuser(rental.userid);
-                        return ListTile(
-                          leading: const Icon(Icons.book, color: Colors.blue),
-                          title: Text(
-                            book.title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.normal,
-                              fontFamily: 'Roboto',
-                              letterSpacing: 0.5,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.menu_book_rounded,
                               color: Colors.blue,
                             ),
                           ),
-                          subtitle: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            physics: const BouncingScrollPhysics(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.min,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'by ${book.author}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
+                                  book.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                     fontStyle: FontStyle.normal,
                                     fontFamily: 'Roboto',
                                     letterSpacing: 0.5,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
+                                    color: Colors.blue,
                                   ),
                                 ),
-                                const SizedBox(width: 20),
-                                Text(
-                                  '${rental.quantity} rented by',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
-                                    fontStyle: FontStyle.normal,
-                                    fontFamily: 'Roboto',
-                                    letterSpacing: 0.5,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(width: 3),
-                                InkWell(
-                                  onTap: () => {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/userdetailscreen',
-                                      arguments: user,
+                                const SizedBox(height: 4),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 4,
+                                  children: [
+                                    Text(
+                                      'by ${book.author}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                     ),
-                                  },
-                                  child: Text(
-                                    user.name,
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.normal,
-                                      fontFamily: 'Roboto',
-                                      letterSpacing: 0.5,
-                                      color: Colors.blue,
+                                    Text(
+                                      '${rental.quantity} rented by',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                     ),
-                                  ),
+                                    InkWell(
+                                      onTap: () => Navigator.pushNamed(
+                                        context,
+                                        '/userdetailscreen',
+                                        arguments: user,
+                                      ),
+                                      child: Text(
+                                        user.name,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                          trailing: IconButton(
-                            onPressed: () => {callreturnsheet(context, rental)},
+                          IconButton(
+                            onPressed: () => callreturnsheet(context, rental),
                             tooltip: 'Return Book',
-                            icon: Icon(Icons.undo, color: Colors.blue),
-                            iconSize: 30,
+                            icon: const Icon(
+                              Icons.restart_alt_rounded,
+                              color: Colors.blue,
+                            ),
+                            iconSize: 28,
                           ),
-                        );
-                      },
-                      separatorBuilder: (context, index) => const Divider(
-                        indent: 16,
-                        endIndent: 16,
-                        thickness: 1,
+                        ],
                       ),
-                    ),
-            ),
-          ],
+                    );
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 2),
+                ),
         ),
       ],
     );

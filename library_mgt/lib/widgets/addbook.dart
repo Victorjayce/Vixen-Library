@@ -31,6 +31,7 @@ class _AddbookState extends State<Addbook> {
   String selectedAuthor = '';
   String addnew = '--add new author--';
   bool showdecrement = true;
+  bool authorchangeable = false;
 
   @override
   void didChangeDependencies() {
@@ -40,8 +41,10 @@ class _AddbookState extends State<Addbook> {
       selectedAuthor = lib.authorNames.isNotEmpty
           ? lib.authorNames.first
           : addnew;
+      authorchangeable = false;
     } else {
       selectedAuthor = widget.author;
+      authorchangeable = true;
     }
   }
 
@@ -123,46 +126,49 @@ class _AddbookState extends State<Addbook> {
                                   ),
                                   const SizedBox(width: 10),
 
-                                  Expanded(
-                                    child: DropdownButton<String>(
-                                      value: selectedAuthor,
-                                      isExpanded: true,
-                                      underline:
-                                          const SizedBox(), // removes default underline
-                                      items: [
-                                        ...library.authorNames.map(
-                                          (name) => DropdownMenuItem(
-                                            value: name,
-                                            child: Text(name),
+                                  IgnorePointer(
+                                    ignoring: !authorchangeable,
+                                    child: Expanded(
+                                      child: DropdownButton<String>(
+                                        value: selectedAuthor,
+                                        isExpanded: true,
+                                        underline:
+                                            const SizedBox(), // removes default underline
+                                        items: [
+                                          ...library.authorNames.map(
+                                            (name) => DropdownMenuItem(
+                                              value: name,
+                                              child: Text(name),
+                                            ),
                                           ),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: addnew,
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: const [
-                                              Icon(
-                                                Icons.person_add,
-                                                size: 20,
-                                                color: Colors.blue,
-                                              ),
-                                              SizedBox(width: 8),
-                                              Text('Add new author...'),
-                                            ],
+                                          DropdownMenuItem(
+                                            value: addnew,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: const [
+                                                Icon(
+                                                  Icons.person_add,
+                                                  size: 20,
+                                                  color: Colors.blue,
+                                                ),
+                                                SizedBox(width: 8),
+                                                Text('Add new author...'),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                      onChanged: (value) {
-                                        setState(() {
-                                          if (value == addnew) {
-                                            _callAddAuthorDialog(context);
-                                          } else {
-                                            setState(() {
-                                              selectedAuthor = value!;
-                                            });
-                                          }
-                                        });
-                                      },
+                                        ],
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (value == addnew) {
+                                              _callAddAuthorDialog(context);
+                                            } else {
+                                              setState(() {
+                                                selectedAuthor = value!;
+                                              });
+                                            }
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ],

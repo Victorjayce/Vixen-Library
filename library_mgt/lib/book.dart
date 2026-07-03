@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Books In Library',
+                '${library.books.length} Books In Library',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

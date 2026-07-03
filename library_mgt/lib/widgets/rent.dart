@@ -26,16 +26,6 @@ Future<int?> showRentsheet(
   int userId = 0,
   String userName = '',
 }) {
-  final libbooks = LibraryProvider.of(context).books;
-  if (bookName.isEmpty && libbooks.isNotEmpty) {
-    bookName = libbooks.first.title;
-    bookId = libbooks.first.id;
-  }
-  final libuser = LibraryProvider.of(context).users;
-  if (userName.isEmpty && libuser.isNotEmpty) {
-    userName = libuser.first.name;
-    userId = libuser.first.id;
-  }
   return showModalBottomSheet(
     context: context,
     backgroundColor: Theme.of(context).colorScheme.surface,
@@ -82,14 +72,24 @@ class _RentState extends State<Rent> {
   int userId = 0;
   bool showdecrement = false;
   bool showincrement = true;
+  bool userchangeable = false;
+  bool bookchangeable = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    selectedBook = widget.bookName;
-    bookId = widget.bookId;
-    selectedUser = widget.userName;
-    userId = widget.userId;
+    final libbooks = LibraryProvider.of(context).books;
+    if (widget.bookName.isEmpty && libbooks.isNotEmpty) {
+      selectedBook = libbooks.first.title;
+      bookId = libbooks.first.id;
+      bookchangeable = true;
+    }
+    final libuser = LibraryProvider.of(context).users;
+    if (widget.userName.isEmpty && libuser.isNotEmpty) {
+      selectedUser = libuser.first.name;
+      userId = libuser.first.id;
+      userchangeable = true;
+    }
   }
 
   @override
@@ -127,31 +127,34 @@ class _RentState extends State<Rent> {
                           const Icon(Icons.book, color: Colors.blue, size: 28),
                           const SizedBox(width: 10),
 
-                          Expanded(
-                            child: DropdownButton<String>(
-                              value: selectedBook,
-                              isExpanded: true,
-                              underline:
-                                  const SizedBox(), // removes default underline
-                              items: [
-                                ...library.bookNames.map(
-                                  (name) => DropdownMenuItem(
-                                    value: name,
-                                    child: Text(name),
+                          IgnorePointer(
+                            ignoring: !bookchangeable,
+                            child: Expanded(
+                              child: DropdownButton<String>(
+                                value: selectedBook,
+                                isExpanded: true,
+                                underline:
+                                    const SizedBox(), // removes default underline
+                                items: [
+                                  ...library.bookNames.map(
+                                    (name) => DropdownMenuItem(
+                                      value: name,
+                                      child: Text(name),
+                                    ),
                                   ),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedBook = value!;
-                                  quantity = 1;
-                                  showdecrement = false;
-                                });
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedBook = value!;
+                                    quantity = 1;
+                                    showdecrement = false;
+                                  });
 
-                                bookId = (library.books.firstWhere(
-                                  (b) => b.title == value!,
-                                )).id;
-                              },
+                                  bookId = (library.books.firstWhere(
+                                    (b) => b.title == value!,
+                                  )).id;
+                                },
+                              ),
                             ),
                           ),
                         ],
@@ -165,30 +168,33 @@ class _RentState extends State<Rent> {
                           ),
                           const SizedBox(width: 10),
 
-                          Expanded(
-                            child: DropdownButton<String>(
-                              value: selectedUser,
-                              isExpanded: true,
-                              underline:
-                                  const SizedBox(), // removes default underline
-                              items: [
-                                ...library.userNames.map(
-                                  (name) => DropdownMenuItem(
-                                    value: name,
-                                    child: Text(name),
+                          IgnorePointer(
+                            ignoring: !userchangeable,
+                            child: Expanded(
+                              child: DropdownButton<String>(
+                                value: selectedUser,
+                                isExpanded: true,
+                                underline:
+                                    const SizedBox(), // removes default underline
+                                items: [
+                                  ...library.userNames.map(
+                                    (name) => DropdownMenuItem(
+                                      value: name,
+                                      child: Text(name),
+                                    ),
                                   ),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedUser = value!;
-                                  quantity = 1;
-                                });
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedUser = value!;
+                                    quantity = 1;
+                                  });
 
-                                userId = (library.users.firstWhere(
-                                  (b) => b.name == value!,
-                                )).id;
-                              },
+                                  userId = (library.users.firstWhere(
+                                    (b) => b.name == value!,
+                                  )).id;
+                                },
+                              ),
                             ),
                           ),
                         ],

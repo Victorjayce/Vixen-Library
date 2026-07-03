@@ -18,7 +18,7 @@ class AuthorDetailPage extends StatefulWidget {
   State<AuthorDetailPage> createState() => _AuthorDetailPageState();
 }
 
-enum MenuAction { rent, addmore, edit, delete }
+enum MenuAction { rent, addmore, delete }
 
 class _AuthorDetailPageState extends State<AuthorDetailPage> {
   bool showAddmore = false;
@@ -197,19 +197,6 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                 ),
                               ),
                               PopupMenuItem(
-                                value: MenuAction.edit,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.bookmark_add,
-                                      color: Colors.orange,
-                                      size: 20,
-                                    ),
-                                    Text('Edit'),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
                                 value: MenuAction.delete,
                                 child: Row(
                                   children: [
@@ -231,11 +218,8 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                 case MenuAction.addmore:
                                   _calladdmore(book.id, context);
                                   break;
-                                case MenuAction.edit:
-                                  _callrent(book.title, book.id);
-                                  break;
                                 case MenuAction.delete:
-                                  _callrent(book.title, book.id);
+                                  _calldelete(context, book.title, book.id);
                                   break;
                               }
                             },
@@ -303,6 +287,72 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
               ? Text('$result book rented from Library')
               : Text('$result books rented from Library'),
           behavior: SnackBarBehavior.fixed,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
+  }
+
+  Future<void> _calldelete(
+    BuildContext context,
+    String bookname,
+    int bookId,
+  ) async {
+    final delete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        if (LibraryProvider.of(
+          context,
+        ).rentals.any((rental) => rental.bookid == bookId)) {
+          return AlertDialog(
+            icon: Icon(Icons.error, color: Colors.orange, size: 40),
+            content: Text(
+              'You can\'t delete a book that have been rented out\n wait for all the copies to be returned to library before continuing this action',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        }
+        return AlertDialog(
+          icon: const Icon(Icons.delete_outline, color: Colors.red, size: 40),
+          title: Text('Delete $bookname'),
+          content: Text(
+            'You are about to permanently delete $bookname\nwould you like to continue',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+    if (delete!) {
+      library.deleteBook(bookId);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Book $bookname deleted from Library'),
+          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.blue.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           margin: EdgeInsets.all(16),

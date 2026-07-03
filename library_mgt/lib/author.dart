@@ -4,13 +4,11 @@ import 'widgets/addauthor.dart';
 
 class AuthorPage extends StatefulWidget {
   const AuthorPage({super.key});
-  //final Library library;
   @override
   State<AuthorPage> createState() => _AuthorPageState();
 }
 
 class _AuthorPageState extends State<AuthorPage> {
-  bool showAddauthor = false;
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
@@ -131,7 +129,7 @@ class _AuthorPageState extends State<AuthorPage> {
                                 size: 40,
                               ),
                               content: Text(
-                                'You can\'t delete an author with more than 1 books published\n delete all the books from library first before continuing this action',
+                                'You can\'t delete an author with more than 1 books published in library\n delete all the books from library first before continuing this action',
                               ),
                               actions: [
                                 TextButton(

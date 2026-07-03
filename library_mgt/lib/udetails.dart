@@ -20,8 +20,18 @@ class _UserDetailState extends State<UserDetail> {
     ).userRentals(widget.user.rentId);
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.surface),
         backgroundColor: Theme.of(context).colorScheme.onSurface,
-        title: Text('User - ${widget.user.name}'),
+        title: Text(
+          'User - ${widget.user.name}',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.normal,
+            fontFamily: 'Roboto',
+            letterSpacing: 0.5,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
       ),
       body: SafeArea(
         child: Column(

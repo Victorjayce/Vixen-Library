@@ -92,7 +92,13 @@ class _RentedPageState extends State<RentedPage>
                                 ),
                                 const SizedBox(width: 3),
                                 InkWell(
-                                  onTap: () => {},
+                                  onTap: () => {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/userdetailscreen',
+                                      arguments: user,
+                                    ),
+                                  },
                                   child: Text(
                                     user.name,
                                     style: TextStyle(

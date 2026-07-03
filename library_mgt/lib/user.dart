@@ -67,7 +67,7 @@ class _UserPageState extends State<UserPage> {
                   onTap: () {
                     Navigator.pushNamed(
                       context,
-                      '/userscreen',
+                      '/userdetailscreen',
                       arguments: user,
                     );
                   },

@@ -38,8 +38,18 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     final List<Book> authorbooks = library.authorBooks(widget.booksId);
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.surface),
         backgroundColor: Theme.of(context).colorScheme.onSurface,
-        title: Text('Author - ${author.name}'),
+        title: Text(
+          'Author - ${author.name}',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.normal,
+            fontFamily: 'Roboto',
+            letterSpacing: 0.5,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
       ),
       body: SafeArea(
         child: Column(

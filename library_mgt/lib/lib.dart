@@ -97,21 +97,21 @@ class Library extends ChangeNotifier {
       title: 'Shadow Master',
       author: 'Guity Three',
       available: 20,
-      rented: 90,
+      rented: 2,
     ),
     Book(
       id: 9,
       title: 'Shadow Slave',
       author: 'Guity Three',
       available: 20,
-      rented: 90,
+      rented: 1,
     ),
     Book(
       id: 10,
       title: 'Sunless',
       author: 'Guity Three',
       available: 20,
-      rented: 90,
+      rented: 3,
     ),
     Book(
       id: 11,
@@ -139,7 +139,7 @@ class Library extends ChangeNotifier {
       title: 'Kill the Sun',
       author: 'Prince Esper',
       available: 29,
-      rented: 12,
+      rented: 4,
     ),
     Book(
       id: 15,
@@ -162,20 +162,20 @@ class Library extends ChangeNotifier {
       available: 20,
       rented: 90,
     ),
-    Book(id: 18, title: 'COI', author: 'Cuttlefish', available: 39, rented: 34),
+    Book(id: 18, title: 'COI', author: 'Cuttlefish', available: 39, rented: 5),
     Book(
       id: 19,
       title: 'Nick the Specter',
       author: 'Prince Esper',
       available: 29,
-      rented: 12,
+      rented: 2,
     ),
     Book(
       id: 20,
       title: 'Home Magus',
       author: 'Novada Rain',
       available: 79,
-      rented: 23,
+      rented: 3,
     ),
     Book(
       id: 21,
@@ -210,7 +210,7 @@ class Library extends ChangeNotifier {
       title: 'The Outer Lords',
       author: 'Prince Esper',
       available: 29,
-      rented: 12,
+      rented: 1,
     ),
   ];
 
@@ -234,10 +234,15 @@ class Library extends ChangeNotifier {
   ];
 
   final List<Rental> _rented = [
-    Rental(id: 1, bookid: 20, userid: 2, quantity: 3),
-    Rental(id: 2, bookid: 7, userid: 2, quantity: 1),
-    Rental(id: 3, bookid: 14, userid: 3, quantity: 4),
-    Rental(id: 4, bookid: 18, userid: 1, quantity: 5),
+    Rental(id: 1, bookid: 20, userid: 1, quantity: 3),
+    Rental(id: 2, bookid: 7, userid: 1, quantity: 1),
+    Rental(id: 3, bookid: 14, userid: 1, quantity: 4),
+    Rental(id: 4, bookid: 18, userid: 3, quantity: 5),
+    Rental(id: 5, bookid: 19, userid: 3, quantity: 2),
+    Rental(id: 6, bookid: 25, userid: 3, quantity: 1),
+    Rental(id: 7, bookid: 8, userid: 2, quantity: 2),
+    Rental(id: 8, bookid: 9, userid: 2, quantity: 1),
+    Rental(id: 9, bookid: 10, userid: 2, quantity: 3),
   ];
 
   List<Book> get books => List.unmodifiable(_books);
@@ -326,7 +331,7 @@ class Library extends ChangeNotifier {
       book.available -= amount;
       book.rented += amount;
       final newrental = Rental(
-        id: _rented.length++,
+        id: _rented.length + 1,
         bookid: bookId,
         userid: userId,
         quantity: amount,

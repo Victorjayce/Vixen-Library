@@ -3,6 +3,7 @@ import 'widgets/containertitle.dart';
 import 'lib.dart';
 import 'dart:ui' as ui;
 import 'widgets/rent.dart';
+import 'widgets/addmore.dart';
 
 class AuthorDetailPage extends StatefulWidget {
   const AuthorDetailPage({
@@ -40,62 +41,75 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
         title: Text('Author - ${author.name}'),
       ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Column(
                   children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Colors.blue,
-                          backgroundImage: null,
-                          child: Icon(
-                            Icons.person,
-                            size: 40,
-                            color: Colors.white,
-                          ),
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.blue,
+                      backgroundImage: null,
+                      child: Icon(Icons.person, size: 40, color: Colors.white),
+                    ),
+                    Hero(
+                      tag: 'name-${author.name}',
+                      transitionOnUserGestures: true,
+                      child: Text(
+                        author.name,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.normal,
+                          fontFamily: 'Roboto',
+                          letterSpacing: 0.5,
+                          color: Colors.blue,
                         ),
-                        Hero(
-                          tag: 'name-${author.name}',
-                          transitionOnUserGestures: true,
-                          child: Text(
-                            author.name,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.normal,
-                              fontFamily: 'Roboto',
-                              letterSpacing: 0.5,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-                if (authorbooks.length > 1)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      ContainerTitle(
-                        title: authorbooks.length == 1
-                            ? '${authorbooks.length}Book'
-                            : '${authorbooks.length}Books',
-                      ),
-                    ],
+              ],
+            ),
+            if (authorbooks.length > 1)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  ContainerTitle(
+                    title: authorbooks.length == 1
+                        ? '${authorbooks.length}Book'
+                        : '${authorbooks.length}Books',
                   ),
-                Expanded(
-                  child: widget.booksId.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No books Published yet.',
-                            style: TextStyle(
+                ],
+              ),
+            Expanded(
+              child: widget.booksId.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No books Published yet.',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.normal,
+                          fontFamily: 'Roboto',
+                          letterSpacing: 0.5,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: authorbooks.length,
+                      itemBuilder: (context, index) {
+                        final book = authorbooks[index];
+                        return ListTile(
+                          leading: const Icon(Icons.book, color: Colors.blue),
+                          title: Text(
+                            book.title,
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               fontStyle: FontStyle.normal,
@@ -104,206 +118,119 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                               color: Colors.blue,
                             ),
                           ),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: authorbooks.length,
-                          itemBuilder: (context, index) {
-                            final book = authorbooks[index];
-                            return ListTile(
-                              leading: const Icon(
-                                Icons.book,
-                                color: Colors.blue,
-                              ),
-                              title: Text(
-                                book.title,
-                                style: const TextStyle(
-                                  fontSize: 20,
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'by ${book.author}',
+                                style: TextStyle(
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   fontStyle: FontStyle.normal,
                                   fontFamily: 'Roboto',
                                   letterSpacing: 0.5,
-                                  color: Colors.blue,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
                               ),
-                              subtitle: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'by ${book.author}',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.normal,
-                                      fontFamily: 'Roboto',
-                                      letterSpacing: 0.5,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${book.available} pieces',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.normal,
-                                      fontFamily: 'Roboto',
-                                      letterSpacing: 0.5,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: PopupMenuButton<MenuAction>(
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    value: MenuAction.rent,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.bookmark_add,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                        Text('Rent'),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuItem(
-                                    value: MenuAction.addmore,
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.add,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                        Text('Add more pieces'),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuItem(
-                                    value: MenuAction.edit,
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.bookmark_add,
-                                          color: Colors.orange,
-                                          size: 20,
-                                        ),
-                                        Text('Edit'),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuItem(
-                                    value: MenuAction.delete,
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                          size: 20,
-                                        ),
-                                        Text('Delete'),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                                onSelected: (action) {
-                                  switch (action) {
-                                    case MenuAction.rent:
-                                      _callrent(book.title, book.id);
-                                      break;
-                                    case MenuAction.addmore:
-                                      _calladd(context, book.id);
-                                      break;
-                                    case MenuAction.edit:
-                                      _callrent(book.title, book.id);
-                                      break;
-                                    case MenuAction.delete:
-                                      _callrent(book.title, book.id);
-                                      break;
-                                  }
-                                },
-                              ),
-                            );
-                          },
-                          separatorBuilder: (context, index) => const Divider(
-                            indent: 16,
-                            endIndent: 16,
-                            thickness: 1,
-                          ),
-                        ),
-                ),
-              ],
-            ),
-            Visibility(
-              visible: showAddmore,
-              maintainState: true,
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: AnimatedScale(
-                  scale: showAddmore ? 1.0 : 0,
-                  duration: Duration(milliseconds: 250),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            AnimatedScale(
-                              scale: showdecrement ? 1.0 : 0,
-                              duration: Duration(milliseconds: 200),
-                              child: IconButton(
-                                onPressed: _decrement,
-                                icon: Icon(
-                                  Icons.remove_circle,
-                                  color: Colors.red,
+                              Text(
+                                '${book.available} pieces',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal,
+                                  fontFamily: 'Roboto',
+                                  letterSpacing: 0.5,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
-                                iconSize: 40,
-                                color: Colors.blue,
                               ),
-                            ),
-                            ContainerTitle(title: quantity.toString()),
-                            IconButton(
-                              onPressed: _increment,
-                              icon: Icon(Icons.add_circle, color: Colors.blue),
-                              iconSize: 40,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          IconButton(
-                            onPressed: _close,
-                            icon: Icon(Icons.close, color: Colors.red),
-                            iconSize: 40,
-                            color: Colors.blue,
+                            ],
                           ),
-                          SizedBox(width: 10),
-                          IconButton(
-                            onPressed: () => _addbooks(context),
-                            icon: Icon(Icons.check, color: Colors.green),
-                            iconSize: 40,
-                            color: Colors.blue,
+                          trailing: PopupMenuButton<MenuAction>(
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: MenuAction.rent,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.bookmark_add,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    ),
+                                    Text('Rent'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: MenuAction.addmore,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.add,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    ),
+                                    Text('Add more pieces'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: MenuAction.edit,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.bookmark_add,
+                                      color: Colors.orange,
+                                      size: 20,
+                                    ),
+                                    Text('Edit'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: MenuAction.delete,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    Text('Delete'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            onSelected: (action) {
+                              switch (action) {
+                                case MenuAction.rent:
+                                  _callrent(book.title, book.id);
+                                  break;
+                                case MenuAction.addmore:
+                                  _calladdmore(book.id, context);
+                                  break;
+                                case MenuAction.edit:
+                                  _callrent(book.title, book.id);
+                                  break;
+                                case MenuAction.delete:
+                                  _callrent(book.title, book.id);
+                                  break;
+                              }
+                            },
                           ),
-                        ],
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Divider(
+                        indent: 16,
+                        endIndent: 16,
+                        thickness: 1,
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ),
           ],
         ),
@@ -341,11 +268,24 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     });
   }
 
-  void _calladd(BuildContext context, int passedId) {
-    setState(() {
-      showAddmore = true;
-      addbookId = passedId;
-    });
+  Future<void> _calladdmore(int id, BuildContext context) async {
+    int? quantity = await showAddMore(context, id: id);
+    if (!context.mounted) return;
+    if (quantity != 0 && quantity != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: quantity == 1
+              ? Text('$quantity piece added to library')
+              : Text('$quantity Pieces added to library'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 
   void _increment() {

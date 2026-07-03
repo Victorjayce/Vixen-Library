@@ -17,7 +17,6 @@ enum MenuAction { rent, addmore, edit, delete }
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   bool showAddbook = false;
-  bool showAddmore = false;
   bool showFab = false;
   int addbookId = 0;
 
@@ -198,7 +197,7 @@ class _HomePageState extends State<HomePage>
                                   _callrent(book.title, book.id);
                                   break;
                                 case MenuAction.addmore:
-                                  _addmore(book.id);
+                                  _calladdmore(book.id, context);
                                   break;
                                 case MenuAction.edit:
                                   _callrent(book.title, book.id);
@@ -239,26 +238,6 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ),
-        Visibility(
-          visible: showAddmore,
-          maintainState: true,
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: AnimatedScale(
-              scale: showAddmore ? 1.0 : 0,
-              duration: Duration(milliseconds: 250),
-              child: AddMore(
-                onClose: () {
-                  setState(() {
-                    showAddmore = false;
-                    showFab = true;
-                  });
-                },
-                bookId: addbookId,
-              ),
-            ),
-          ),
-        ),
       ],
     );
     // floatingActionButton: IgnorePointer(
@@ -286,12 +265,24 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  void _addmore(int id) {
-    addbookId = id;
-    setState(() {
-      showAddmore = !showAddmore;
-      showFab = !showFab;
-    });
+  Future<void> _calladdmore(int id, BuildContext context) async {
+    int? quantity = await showAddMore(context, id: id);
+    if (!context.mounted) return;
+    if (quantity != 0 && quantity != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: quantity == 1
+              ? Text('$quantity piece added to library')
+              : Text('$quantity Pieces added to library'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
+          duration: Duration(seconds: 2),
+          showCloseIcon: true,
+        ),
+      );
+    }
   }
 
   Future<void> _callrent(String name, int id) async {

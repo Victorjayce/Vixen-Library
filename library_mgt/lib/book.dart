@@ -114,6 +114,9 @@ class _HomePageState extends State<HomePage>
                   itemCount: library.books.length,
                   itemBuilder: (context, index) {
                     final book = library.books[index];
+                    final author = LibraryProvider.of(
+                      context,
+                    ).authors.firstWhere((a) => a.name == book.author);
                     return Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -160,14 +163,24 @@ class _HomePageState extends State<HomePage>
                                   spacing: 12,
                                   runSpacing: 4,
                                   children: [
-                                    Text(
-                                      'by ${book.author}',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Theme.of(
+                                    InkWell(
+                                      onTap: () => {
+                                        Navigator.pushNamed(
                                           context,
-                                        ).colorScheme.onSurface,
+                                          '/detailscreen',
+                                          arguments: AuthorDetailArgs(
+                                            booksId: author.booksId,
+                                            authorId: author.id,
+                                          ),
+                                        ),
+                                      },
+                                      child: Text(
+                                        'by ${book.author}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue,
+                                        ),
                                       ),
                                     ),
                                     Text(

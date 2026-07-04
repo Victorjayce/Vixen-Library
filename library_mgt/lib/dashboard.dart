@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'lib.dart';
+import 'datetimextension.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({super.key});
@@ -176,7 +177,7 @@ class _DashBoardState extends State<DashBoard>
                     ),
                     title: Text(activity.title),
                     subtitle: Text(
-                      '${activity.name} ${activity.subtitle} • ${activity.timestamp}',
+                      '${activity.name} ${activity.subtitle} • ${activity.timestamp.timeAgo}',
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                   );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'lib.dart';
-import 'datetimextension.dart';
+import 'extensions/datetimextension.dart';
+import 'extensions/statype.dart';
+import 'extensions/activitytype.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({super.key});
@@ -18,6 +20,7 @@ class _DashBoardState extends State<DashBoard>
   Widget build(BuildContext context) {
     super.build(context);
     final scheme = Theme.of(context).colorScheme;
+    List<int> statList = [1, 2, 3, 4];
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -85,32 +88,6 @@ class _DashBoardState extends State<DashBoard>
                       ),
                     ],
                   ),
-                  // const SizedBox(height: 16),
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(
-                  //     horizontal: 12,
-                  //     vertical: 10,
-                  //   ),
-                  //   decoration: BoxDecoration(
-                  //     color: scheme.surface.withValues(alpha: 0.2),
-                  //     borderRadius: BorderRadius.circular(14),
-                  //   ),
-                  //   child: Row(
-                  //     children: [
-                  //       Icon(Icons.insights_rounded, color: scheme.onPrimary),
-                  //       const SizedBox(width: 8),
-                  //       Expanded(
-                  //         child: Text(
-                  //           'You have 6 books due for return this week.',
-                  //           style: TextStyle(
-                  //             color: scheme.onPrimary,
-                  //             fontWeight: FontWeight.w600,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -129,12 +106,12 @@ class _DashBoardState extends State<DashBoard>
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               childAspectRatio: 1.25,
-              children: LibraryProvider.of(context).statsList
+              children: statList
                   .map(
                     (stat) => _StatCard(
                       icon: stat.icon,
-                      label: stat.label,
-                      value: stat.value,
+                      label: stat.title,
+                      value: stat.value(LibraryProvider.of(context)),
                       color: stat.color,
                     ),
                   )
@@ -173,11 +150,14 @@ class _DashBoardState extends State<DashBoard>
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: scheme.primaryContainer,
-                      child: Icon(activity.icon, color: scheme.primary),
+                      child: Icon(
+                        activity.activityenum.icon,
+                        color: scheme.primary,
+                      ),
                     ),
-                    title: Text(activity.title),
+                    title: Text(activity.activityenum.title),
                     subtitle: Text(
-                      '${activity.name} ${activity.subtitle} • ${activity.timestamp.timeAgo}',
+                      '${activity.name}  • ${activity.subtitle} • ${activity.timestamp.timeAgo}',
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                   );

@@ -17,35 +17,25 @@ class Book {
 }
 
 class ActivityItem {
-  final String title;
   final String name;
   final String subtitle;
-  final IconData icon;
   final DateTime timestamp;
+  final ActivityEnum activityenum;
 
   ActivityItem({
-    required this.title,
     required this.name,
     required this.subtitle,
-    required this.icon,
     required this.timestamp,
+    required this.activityenum,
   });
 }
 
 class StatItem {
-  final String title;
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
+  final int id;
+  int value;
+  final String tag;
 
-  StatItem({
-    required this.title,
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  StatItem({required this.id, required this.value, required this.tag});
 }
 
 enum ActivityEnum {
@@ -297,57 +287,59 @@ class Library extends ChangeNotifier {
 
   final List<ActivityItem> activities = [
     ActivityItem(
-      title: 'New book added',
       name: 'The Hobbit',
       subtitle: ' • 20 pcs was added to library',
-      icon: Icons.auto_stories_rounded,
       timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+      activityenum: ActivityEnum.newBook,
     ),
     ActivityItem(
-      title: 'Book returned',
       name: 'Atomic Habits',
       subtitle: ' • by Victor Mart',
-      icon: Icons.restart_alt_rounded,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
+      activityenum: ActivityEnum.bookRented,
     ),
     ActivityItem(
-      title: 'User registered',
       name: 'Amina',
       subtitle: ' • joined the library',
-      icon: Icons.person_add_alt_rounded,
       timestamp: DateTime.now(),
+      activityenum: ActivityEnum.userRegistered,
     ),
   ];
   final List<StatItem> stats = [
-    StatItem(
-      title: 'Books',
-      icon: Icons.menu_book_rounded,
-      label: 'Books',
-      value: '128',
-      color: Colors.blueAccent,
-    ),
-    StatItem(
-      title: 'Authors',
-      icon: Icons.person_rounded,
-      label: 'Authors',
-      value: '24',
-      color: Colors.cyan,
-    ),
-    StatItem(
-      title: 'Users',
-      icon: Icons.people_alt_rounded,
-      label: 'Users',
-      value: '56',
-      color: Colors.indigo,
-    ),
-    StatItem(
-      title: 'Rented',
-      icon: Icons.bookmark_added_rounded,
-      label: 'Rented',
-      value: '18',
-      color: Colors.teal,
-    ),
+    StatItem(id: 1, value: 0, tag: 'Books'),
+    StatItem(id: 2, value: 0, tag: 'Authors'),
+    StatItem(id: 3, value: 0, tag: 'Users'),
+    StatItem(id: 4, value: 0, tag: 'Rented'),
   ];
+  void setStat(int id) {
+    final statitem = stats.firstWhere((s) => s.id == id);
+    statitem.value = books.length;
+    switch (statitem.id) {
+      case 1:
+        statitem.value = books.length;
+        break;
+      case 2:
+        statitem.value = authors.length;
+        break;
+      case 3:
+        statitem.value = users.length;
+        break;
+      case 4:
+        statitem.value = rentals.fold(
+          0,
+          (total, rental) => total + rental.quantity,
+        );
+      default:
+    }
+  }
+
+  int get totalBooks => _books.length;
+  int get totalAuthors => _authors.length;
+  int get totalUsers => _users.length;
+  int get totalRented =>
+      _rented.fold(0, (total, rental) => total + rental.quantity);
+  int get totalCopies =>
+      _books.fold(0, (total, book) => total + book.available);
   List<Book> get books => List.unmodifiable(_books);
   List<User> get users => List.unmodifiable(_users);
   List<Rental> get rentals => List.unmodifiable(_rented);
@@ -368,11 +360,10 @@ class Library extends ChangeNotifier {
     String subtitle,
   ) {
     final activity = ActivityItem(
-      title: activityEnum.title,
       name: name,
-      subtitle: '',
-      icon: activityEnum.icon,
+      subtitle: subtitle,
       timestamp: timestamp,
+      activityenum: activityEnum,
     );
     activities.add(activity);
     notifyListeners();
@@ -400,7 +391,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.newBook,
       DateTime.now(),
       title,
-      ' • $quantity pcs was added to library',
+      '$quantity pcs was added to library',
     );
     notifyListeners();
     return true;
@@ -417,7 +408,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.userRegistered,
       DateTime.now(),
       name,
-      ' • joined the library',
+      'joined the library',
     );
     notifyListeners();
     return true;
@@ -434,7 +425,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.userEdited,
       DateTime.now(),
       newname,
-      ' • Changed from $oldname',
+      'Changed from $oldname',
     );
     notifyListeners();
     return true;
@@ -451,7 +442,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.newPieces,
       DateTime.now(),
       book.title,
-      ' • $quantity pieces added',
+      '$quantity pieces added',
     );
     notifyListeners();
   }
@@ -490,7 +481,7 @@ class Library extends ChangeNotifier {
         ActivityEnum.bookRented,
         DateTime.now(),
         book.title,
-        ' • by ${user.name}',
+        'by ${user.name}',
       );
       notifyListeners();
     }
@@ -513,7 +504,7 @@ class Library extends ChangeNotifier {
         ActivityEnum.bookReturned,
         DateTime.now(),
         book.title,
-        ' • by ${user.name}',
+        'by ${user.name}',
       );
       notifyListeners();
     }
@@ -533,7 +524,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.authorAdded,
       DateTime.now(),
       name,
-      ' • Author logged to library',
+      'Author logged to library',
     );
     notifyListeners();
     return true;
@@ -562,7 +553,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.authorEdited,
       DateTime.now(),
       author.name,
-      ' • from $oldname',
+      'from $oldname',
     );
     notifyListeners();
     return true;
@@ -579,7 +570,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.userEdited,
       DateTime.now(),
       user.name,
-      ' • from $oldname',
+      'from $oldname',
     );
     notifyListeners();
     return true;
@@ -593,7 +584,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.authorDeleted,
       DateTime.now(),
       author.name,
-      ' • Deleted from library logs',
+      'Deleted from library logs',
     );
     notifyListeners();
     return true;
@@ -607,7 +598,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.userDeleted,
       DateTime.now(),
       user.name,
-      ' • left the library',
+      'left the library',
     );
     notifyListeners();
     return true;
@@ -620,7 +611,7 @@ class Library extends ChangeNotifier {
       ActivityEnum.bookDeleted,
       DateTime.now(),
       book.title,
-      ' • was deleted from the library',
+      'was deleted from the library',
     );
     notifyListeners();
   }

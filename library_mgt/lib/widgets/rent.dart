@@ -37,6 +37,8 @@ Future<int?> showRentsheet(
       return SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 12),
 
@@ -101,164 +103,157 @@ class _RentState extends State<Rent> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[ContainerTitle(title: 'Rent Book')],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.book, color: Colors.blue, size: 28),
-                          const SizedBox(width: 10),
-
-                          IgnorePointer(
-                            ignoring: !bookchangeable,
-                            child: Expanded(
-                              child: DropdownButton<String>(
-                                value: selectedBook,
-                                isExpanded: true,
-                                underline:
-                                    const SizedBox(), // removes default underline
-                                items: [
-                                  ...library.bookNames.map(
-                                    (name) => DropdownMenuItem(
-                                      value: name,
-                                      child: Text(name),
-                                    ),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedBook = value!;
-                                    quantity = 1;
-                                    showdecrement = false;
-                                  });
-
-                                  bookId = (library.books.firstWhere(
-                                    (b) => b.title == value!,
-                                  )).id;
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.people,
-                            color: Colors.blue,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-
-                          IgnorePointer(
-                            ignoring: !userchangeable,
-                            child: Expanded(
-                              child: DropdownButton<String>(
-                                value: selectedUser,
-                                isExpanded: true,
-                                underline:
-                                    const SizedBox(), // removes default underline
-                                items: [
-                                  ...library.userNames.map(
-                                    (name) => DropdownMenuItem(
-                                      value: name,
-                                      child: Text(name),
-                                    ),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedUser = value!;
-                                    quantity = 1;
-                                  });
-
-                                  userId = (library.users.firstWhere(
-                                    (b) => b.name == value!,
-                                  )).id;
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(2),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      AnimatedScale(
-                        scale: showdecrement ? 1.0 : 0,
-                        duration: Duration(milliseconds: 200),
-                        child: IconButton(
-                          onPressed: () => {_decrement(context)},
-                          icon: Icon(Icons.remove_circle, color: Colors.red),
-                          iconSize: 40,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      ContainerTitle(title: quantity.toString()),
-                      AnimatedScale(
-                        scale: showincrement ? 1.0 : 0,
-                        duration: Duration(milliseconds: 200),
-                        child: IconButton(
-                          onPressed: () => {_increment(context)},
-                          icon: Icon(Icons.add_circle, color: Colors.blue),
-                          iconSize: 40,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed: () => Navigator.pop(context, 0),
-                icon: const Icon(Icons.close, color: Colors.red, size: 50),
-                tooltip: 'Cancel',
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[ContainerTitle(title: 'Rent Book')],
               ),
-              SizedBox(width: 40),
-              IconButton(
-                onPressed: () => _rent(context),
-                icon: const Icon(Icons.check, color: Colors.green, size: 50),
-                tooltip: 'Save',
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.book, color: Colors.blue, size: 28),
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          child: IgnorePointer(
+                            ignoring: !bookchangeable,
+                            child: DropdownButton<String>(
+                              value: selectedBook,
+                              isExpanded: true,
+                              underline:
+                                  const SizedBox(), // removes default underline
+                              items: [
+                                ...library.bookNames.map(
+                                  (name) => DropdownMenuItem(
+                                    value: name,
+                                    child: Text(name),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedBook = value!;
+                                  quantity = 1;
+                                  showdecrement = false;
+                                });
+
+                                bookId = (library.books.firstWhere(
+                                  (b) => b.title == value!,
+                                )).id;
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.people, color: Colors.blue, size: 28),
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          child: IgnorePointer(
+                            ignoring: !userchangeable,
+                            child: DropdownButton<String>(
+                              value: selectedUser,
+                              isExpanded: true,
+                              underline:
+                                  const SizedBox(), // removes default underline
+                              items: [
+                                ...library.userNames.map(
+                                  (name) => DropdownMenuItem(
+                                    value: name,
+                                    child: Text(name),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedUser = value!;
+                                  quantity = 1;
+                                });
+
+                                userId = (library.users.firstWhere(
+                                  (b) => b.name == value!,
+                                )).id;
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(2),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    AnimatedScale(
+                      scale: showdecrement ? 1.0 : 0,
+                      duration: Duration(milliseconds: 200),
+                      child: IconButton(
+                        onPressed: () => {_decrement(context)},
+                        icon: Icon(Icons.remove_circle, color: Colors.red),
+                        iconSize: 40,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    ContainerTitle(title: quantity.toString()),
+                    AnimatedScale(
+                      scale: showincrement ? 1.0 : 0,
+                      duration: Duration(milliseconds: 200),
+                      child: IconButton(
+                        onPressed: () => {_increment(context)},
+                        icon: Icon(Icons.add_circle, color: Colors.blue),
+                        iconSize: 40,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () => Navigator.pop(context, 0),
+              icon: const Icon(Icons.close, color: Colors.red, size: 50),
+              tooltip: 'Cancel',
+            ),
+            SizedBox(width: 40),
+            IconButton(
+              onPressed: () => _rent(context),
+              icon: const Icon(Icons.check, color: Colors.green, size: 50),
+              tooltip: 'Save',
+            ),
+          ],
+        ),
+      ],
     );
   }
 

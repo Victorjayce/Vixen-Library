@@ -18,12 +18,14 @@ class Book {
 
 class ActivityItem {
   final String title;
+  final String name;
   final String subtitle;
   final IconData icon;
   final DateTime timestamp;
 
   ActivityItem({
     required this.title,
+    required this.name,
     required this.subtitle,
     required this.icon,
     required this.timestamp,
@@ -56,7 +58,8 @@ enum ActivityEnum {
   newPieces(Icons.my_library_add_rounded, 'New pieces added'),
   bookDeleted(Icons.delete_outline, 'Book deleted'),
   authorEdited(Icons.edit, 'Author edited'),
-  userEdited(Icons.edit, 'User edited');
+  userEdited(Icons.edit, 'User edited'),
+  bookRented(Icons.bookmark_added, 'Book Rented');
 
   final IconData icon;
   final String title;
@@ -295,19 +298,22 @@ class Library extends ChangeNotifier {
   final List<ActivityItem> activities = [
     ActivityItem(
       title: 'New book added',
-      subtitle: 'The Hobbit',
+      name: 'The Hobbit',
+      subtitle: ' • 20 pcs was added to library',
       icon: Icons.auto_stories_rounded,
       timestamp: DateTime.now().subtract(const Duration(hours: 2)),
     ),
     ActivityItem(
       title: 'Book returned',
-      subtitle: 'Atomic Habits',
+      name: 'Atomic Habits',
+      subtitle: ' • by Victor Mart',
       icon: Icons.restart_alt_rounded,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
     ),
     ActivityItem(
       title: 'User registered',
-      subtitle: 'Amina joined the library',
+      name: 'Amina',
+      subtitle: ' • joined the library',
       icon: Icons.person_add_alt_rounded,
       timestamp: DateTime.now(),
     ),
@@ -355,9 +361,15 @@ class Library extends ChangeNotifier {
       List.unmodifiable(activities.reversed.toList());
   List<StatItem> get statsList => List.unmodifiable(stats);
 
-  void addActivity(ActivityEnum activityEnum, DateTime timestamp) {
+  void addActivity(
+    ActivityEnum activityEnum,
+    DateTime timestamp,
+    String name,
+    String subtitle,
+  ) {
     final activity = ActivityItem(
       title: activityEnum.title,
+      name: name,
       subtitle: '',
       icon: activityEnum.icon,
       timestamp: timestamp,
@@ -384,6 +396,12 @@ class Library extends ChangeNotifier {
 
     abook.booksId.add(newBook.id);
     _books.add(newBook);
+    addActivity(
+      ActivityEnum.newBook,
+      DateTime.now(),
+      title,
+      ' • $quantity pcs was added to library',
+    );
     notifyListeners();
     return true;
   }
@@ -395,6 +413,12 @@ class Library extends ChangeNotifier {
 
     final newUser = User(id: _users.length + 1, name: name, rentId: []);
     _users.add(newUser);
+    addActivity(
+      ActivityEnum.userRegistered,
+      DateTime.now(),
+      name,
+      ' • joined the library',
+    );
     notifyListeners();
     return true;
   }
@@ -404,7 +428,14 @@ class Library extends ChangeNotifier {
       return false;
     }
     final user = _users.firstWhere((u) => u.id == id);
+    String oldname = user.name;
     user.name = newname;
+    addActivity(
+      ActivityEnum.userEdited,
+      DateTime.now(),
+      newname,
+      ' • Changed from $oldname',
+    );
     notifyListeners();
     return true;
   }
@@ -416,6 +447,12 @@ class Library extends ChangeNotifier {
     );
 
     book.available += quantity;
+    addActivity(
+      ActivityEnum.newPieces,
+      DateTime.now(),
+      book.title,
+      ' • $quantity pieces added',
+    );
     notifyListeners();
   }
 
@@ -449,6 +486,12 @@ class Library extends ChangeNotifier {
       );
       _rented.add(newrental);
       user.rentId.add(newrental.id);
+      addActivity(
+        ActivityEnum.bookRented,
+        DateTime.now(),
+        book.title,
+        ' • by ${user.name}',
+      );
       notifyListeners();
     }
   }
@@ -466,6 +509,12 @@ class Library extends ChangeNotifier {
       book.available += amount;
       _rented.remove(rental);
       user.rentId.remove(rentId);
+      addActivity(
+        ActivityEnum.bookReturned,
+        DateTime.now(),
+        book.title,
+        ' • by ${user.name}',
+      );
       notifyListeners();
     }
   }
@@ -480,19 +529,27 @@ class Library extends ChangeNotifier {
       booksId: booksId,
     );
     _authors.add(newAuthor);
+    addActivity(
+      ActivityEnum.authorAdded,
+      DateTime.now(),
+      name,
+      ' • Author logged to library',
+    );
     notifyListeners();
     return true;
   }
 
-  bool updateAuthor(int id, String newname) {
-    if (_authors.any((a) => a.name.toLowerCase() == newname.toLowerCase())) {
-      return false;
-    }
-    final author = _authors.firstWhere((a) => a.id == id);
-    author.name = newname;
-    notifyListeners();
-    return true;
-  }
+  // bool updateAuthor(int id, String newname) {
+  //   if (_authors.any((a) => a.name.toLowerCase() == newname.toLowerCase())) {
+  //     return false;
+  //   }
+  //   final author = _authors.firstWhere((a) => a.id == id);
+  //   String oldname = author.name;
+  //   author.name = newname;
+  //   addActivity(ActivityEnum.authorEdited, DateTime.now(), author.name, 'from $oldname');
+  //   notifyListeners();
+  //   return true;
+  // }
 
   bool editAuthor(String oldname, int id, String newname) {
     if (!_authors.any((a) => a.name == oldname) ||
@@ -501,6 +558,12 @@ class Library extends ChangeNotifier {
     }
     final author = _authors.firstWhere((a) => a.id == id);
     author.name = newname;
+    addActivity(
+      ActivityEnum.authorEdited,
+      DateTime.now(),
+      author.name,
+      ' • from $oldname',
+    );
     notifyListeners();
     return true;
   }
@@ -512,6 +575,12 @@ class Library extends ChangeNotifier {
     }
     final user = _users.firstWhere((a) => a.id == id);
     user.name = newname;
+    addActivity(
+      ActivityEnum.userEdited,
+      DateTime.now(),
+      user.name,
+      ' • from $oldname',
+    );
     notifyListeners();
     return true;
   }
@@ -520,6 +589,12 @@ class Library extends ChangeNotifier {
     final author = _authors.firstWhere((a) => a.id == id);
     if (author.booksId.isNotEmpty) return false;
     _authors.remove(author);
+    addActivity(
+      ActivityEnum.authorDeleted,
+      DateTime.now(),
+      author.name,
+      ' • Deleted from library logs',
+    );
     notifyListeners();
     return true;
   }
@@ -528,6 +603,12 @@ class Library extends ChangeNotifier {
     final user = _users.firstWhere((a) => a.id == id);
     if (user.rentId.isNotEmpty) return false;
     _users.remove(user);
+    addActivity(
+      ActivityEnum.userDeleted,
+      DateTime.now(),
+      user.name,
+      ' • left the library',
+    );
     notifyListeners();
     return true;
   }
@@ -535,6 +616,12 @@ class Library extends ChangeNotifier {
   void deleteBook(int id) {
     final book = _books.firstWhere((a) => a.id == id);
     _books.remove(book);
+    addActivity(
+      ActivityEnum.bookDeleted,
+      DateTime.now(),
+      book.title,
+      ' • was deleted from the library',
+    );
     notifyListeners();
   }
 

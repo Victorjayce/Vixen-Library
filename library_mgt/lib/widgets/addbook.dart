@@ -126,9 +126,9 @@ class _AddbookState extends State<Addbook> {
                                   ),
                                   const SizedBox(width: 10),
 
-                                  IgnorePointer(
-                                    ignoring: !authorchangeable,
-                                    child: Expanded(
+                                  Expanded(
+                                    child: IgnorePointer(
+                                      ignoring: !authorchangeable,
                                       child: DropdownButton<String>(
                                         value: selectedAuthor,
                                         isExpanded: true,

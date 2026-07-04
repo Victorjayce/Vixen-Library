@@ -37,7 +37,7 @@ class _DashBoardState extends State<DashBoard>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
                     color: scheme.primary.withValues(alpha: 0.18),
@@ -176,7 +176,7 @@ class _DashBoardState extends State<DashBoard>
                     ),
                     title: Text(activity.title),
                     subtitle: Text(
-                      '${activity.subtitle} • ${activity.timestamp}',
+                      '${activity.name} ${activity.subtitle} • ${activity.timestamp}',
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                   );

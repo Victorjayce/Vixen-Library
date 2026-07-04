@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'containertitle.dart';
 import 'package:library_mgt/lib.dart';
+import 'form_shell.dart';
 
 class Adduser extends StatefulWidget {
   const Adduser({super.key, this.userName = '', this.id = 0});
@@ -18,12 +18,8 @@ Future<String?> showAddUser(
 }) {
   return showDialog<String>(
     context: context,
-    builder: (_) => Dialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      clipBehavior: Clip.antiAlias,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+    builder: (_) => appDialog(
+      context: context,
       child: Adduser(userName: userName, id: id),
     ),
   );
@@ -31,76 +27,58 @@ Future<String?> showAddUser(
 
 class _AdduserState extends State<Adduser> {
   final TextEditingController _usernamecontroller = TextEditingController();
+  bool _initialized = false;
+
   @override
   void initState() {
     super.initState();
-
-    _usernamecontroller.addListener(() {
-      setState(() {});
-    });
+    _usernamecontroller.addListener(() => setState(() {}));
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _usernamecontroller.text = widget.userName;
+    if (!_initialized) {
+      _usernamecontroller.text = widget.userName;
+      _initialized = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernamecontroller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[ContainerTitle(title: 'New Author')],
-            ),
-            TextField(
-              controller: _usernamecontroller,
-              decoration: InputDecoration(
-                labelText: 'Author Name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                prefixIcon: Icon(Icons.person, color: Colors.blue, size: 30),
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                IconButton(
-                  onPressed: () => {Navigator.pop(context)},
-                  icon: Icon(Icons.close, color: Colors.red),
-                  iconSize: 40,
-                  color: Colors.blue,
-                ),
-                SizedBox(width: 40),
-                AnimatedScale(
-                  scale: _usernamecontroller.text.trim().isNotEmpty ? 1.0 : 0.0,
-                  duration: Duration(milliseconds: 150),
-                  child: IconButton(
-                    onPressed: () => _savenewuser(context),
-                    icon: Icon(Icons.check, color: Colors.green),
-                    iconSize: 40,
-                    color: Colors.blue,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    final editing = widget.id != 0;
+
+    return FormScaffold(
+      icon: editing ? Icons.edit : Icons.person_add_alt_rounded,
+      title: editing ? 'Edit user' : 'New user',
+      subtitle: editing
+          ? 'Update this reader profile.'
+          : 'Register a reader who can rent books.',
+      saveEnabled: _usernamecontroller.text.trim().isNotEmpty,
+      onCancel: () => Navigator.pop(context),
+      onSave: () => _savenewuser(context),
+      children: [
+        TextField(
+          controller: _usernamecontroller,
+          textInputAction: TextInputAction.done,
+          decoration: appInputDecoration(
+            context: context,
+            label: 'User name',
+            icon: Icons.person_outline,
+          ),
+          onSubmitted: (_) {
+            if (_usernamecontroller.text.trim().isNotEmpty) {
+              _savenewuser(context);
+            }
+          },
         ),
-      ),
+      ],
     );
   }
 

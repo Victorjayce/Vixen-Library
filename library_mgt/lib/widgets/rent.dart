@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:library_mgt/lib.dart';
-import 'containertitle.dart';
+import 'package:library_mgt/widgets/form_shell.dart';
 
 class Rent extends StatefulWidget {
   const Rent({
@@ -103,155 +103,70 @@ class _RentState extends State<Rent> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    final available = library.books.firstWhere((b) => b.id == bookId).available;
+
+    return FormScaffold(
+      icon: Icons.library_add_check_rounded,
+      title: 'Rent book',
+      subtitle: 'Assign a book to a library member.',
+      saveLabel: 'Rent',
+      onCancel: () => Navigator.pop(context, 0),
+      onSave: () => _rent(context),
+
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[ContainerTitle(title: 'Rent Book')],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.book, color: Colors.blue, size: 28),
-                        const SizedBox(width: 10),
-
-                        Expanded(
-                          child: IgnorePointer(
-                            ignoring: !bookchangeable,
-                            child: DropdownButton<String>(
-                              value: selectedBook,
-                              isExpanded: true,
-                              underline:
-                                  const SizedBox(), // removes default underline
-                              items: [
-                                ...library.bookNames.map(
-                                  (name) => DropdownMenuItem(
-                                    value: name,
-                                    child: Text(name),
-                                  ),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedBook = value!;
-                                  quantity = 1;
-                                  showdecrement = false;
-                                });
-
-                                bookId = (library.books.firstWhere(
-                                  (b) => b.title == value!,
-                                )).id;
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.people, color: Colors.blue, size: 28),
-                        const SizedBox(width: 10),
-
-                        Expanded(
-                          child: IgnorePointer(
-                            ignoring: !userchangeable,
-                            child: DropdownButton<String>(
-                              value: selectedUser,
-                              isExpanded: true,
-                              underline:
-                                  const SizedBox(), // removes default underline
-                              items: [
-                                ...library.userNames.map(
-                                  (name) => DropdownMenuItem(
-                                    value: name,
-                                    child: Text(name),
-                                  ),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedUser = value!;
-                                  quantity = 1;
-                                });
-
-                                userId = (library.users.firstWhere(
-                                  (b) => b.name == value!,
-                                )).id;
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(2),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    AnimatedScale(
-                      scale: showdecrement ? 1.0 : 0,
-                      duration: Duration(milliseconds: 200),
-                      child: IconButton(
-                        onPressed: () => {_decrement(context)},
-                        icon: Icon(Icons.remove_circle, color: Colors.red),
-                        iconSize: 40,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    ContainerTitle(title: quantity.toString()),
-                    AnimatedScale(
-                      scale: showincrement ? 1.0 : 0,
-                      duration: Duration(milliseconds: 200),
-                      child: IconButton(
-                        onPressed: () => {_increment(context)},
-                        icon: Icon(Icons.add_circle, color: Colors.blue),
-                        iconSize: 40,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        DropdownButtonFormField<String>(
+          initialValue: selectedBook,
+          decoration: appInputDecoration(
+            context: context,
+            label: 'Book',
+            icon: Icons.book_outlined,
           ),
+          items: library.bookNames.map((book) {
+            return DropdownMenuItem(value: book, child: Text(book));
+          }).toList(),
+          onChanged: bookchangeable
+              ? (value) {
+                  setState(() {
+                    selectedBook = value!;
+                    quantity = 1;
+                  });
+
+                  bookId = library.books.firstWhere((b) => b.title == value).id;
+                }
+              : null,
+        ),
+
+        const SizedBox(height: 16),
+
+        DropdownButtonFormField<String>(
+          initialValue: selectedUser,
+          decoration: appInputDecoration(
+            context: context,
+            label: 'Library member',
+            icon: Icons.person_outline,
+          ),
+          items: library.userNames.map((user) {
+            return DropdownMenuItem(value: user, child: Text(user));
+          }).toList(),
+          onChanged: userchangeable
+              ? (value) {
+                  setState(() {
+                    selectedUser = value!;
+                    quantity = 1;
+                  });
+
+                  userId = library.users.firstWhere((u) => u.name == value).id;
+                }
+              : null,
         ),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              onPressed: () => Navigator.pop(context, 0),
-              icon: const Icon(Icons.close, color: Colors.red, size: 50),
-              tooltip: 'Cancel',
-            ),
-            SizedBox(width: 40),
-            IconButton(
-              onPressed: () => _rent(context),
-              icon: const Icon(Icons.check, color: Colors.green, size: 50),
-              tooltip: 'Save',
-            ),
-          ],
+
+        QuantityStepper(
+          value: quantity,
+          canDecrement: quantity > 1,
+          canIncrement: quantity < available,
+          onIncrement: () => _increment(context),
+          onDecrement: () => _decrement(context),
         ),
       ],
     );
@@ -310,7 +225,7 @@ class _RentState extends State<Rent> {
           icon: const Icon(Icons.info_outline, color: Colors.orange, size: 40),
           title: Text(''),
           content: Text(
-            'You are about to rent $quantity books to ${widget.userName}?',
+            'You are about to rent $quantity books to $selectedUser?',
           ),
           actions: [
             TextButton(
@@ -330,8 +245,9 @@ class _RentState extends State<Rent> {
       },
     );
     if (!context.mounted) return;
-    if (!rent!) {
+    if (rent != true) {
       Navigator.pop(context);
+      return;
     }
     library.rentBook(bookId, quantity, userId);
     Navigator.pop(context, quantity);

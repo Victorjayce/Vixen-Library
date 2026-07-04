@@ -204,7 +204,7 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                        onPressed: () => _calladdbook(context),
+                        onPressed: () => _calladdbook(context, author.name),
                         tooltip: 'Add Book',
                         iconSize: 32,
                         color: scheme.onPrimary,
@@ -413,8 +413,8 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
     }
   }
 
-  Future<void> _calladdbook(BuildContext context) async {
-    String? bookName = await showAddBook(context);
+  Future<void> _calladdbook(BuildContext context, String authorname) async {
+    String? bookName = await showAddBook(context, author: authorname);
     if (!context.mounted) return;
     if (bookName != null && bookName.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

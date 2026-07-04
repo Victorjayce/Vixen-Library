@@ -373,7 +373,7 @@ class _UserDetailState extends State<UserDetail> {
           content: result == 1
               ? Text('$result book rented from Library')
               : Text('$result books rented from Library'),
-          behavior: SnackBarBehavior.fixed,
+          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.blue.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           margin: EdgeInsets.all(16),

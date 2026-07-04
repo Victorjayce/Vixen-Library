@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:library_mgt/widgets/containertitle.dart';
+import 'package:library_mgt/widgets/form_shell.dart';
 import 'package:library_mgt/lib.dart';
 import 'addauthor.dart';
 
@@ -10,7 +10,7 @@ class Addbook extends StatefulWidget {
   State<Addbook> createState() => _AddbookState();
 }
 
-Future<String?> showAddBook(BuildContext context) {
+Future<String?> showAddBook(BuildContext context, {String author = ''}) {
   return showModalBottomSheet<String>(
     context: context,
     backgroundColor: Theme.of(context).colorScheme.surface,
@@ -18,7 +18,31 @@ Future<String?> showAddBook(BuildContext context) {
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (_) => Addbook(),
+    builder: (context) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 12),
+
+            // Drag handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            Addbook(author: author),
+          ],
+        ),
+      );
+    },
   );
 }
 
@@ -41,10 +65,9 @@ class _AddbookState extends State<Addbook> {
       selectedAuthor = lib.authorNames.isNotEmpty
           ? lib.authorNames.first
           : addnew;
-      authorchangeable = false;
+      authorchangeable = true;
     } else {
       selectedAuthor = widget.author;
-      authorchangeable = true;
     }
   }
 
@@ -60,195 +83,68 @@ class _AddbookState extends State<Addbook> {
   @override
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surface.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                ContainerTitle(title: 'Add Books'),
-                              ],
-                            ),
-                            TextField(
-                              controller: _booknamecontroller,
-                              decoration: InputDecoration(
-                                labelText: 'Book Name',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.book,
-                                  color: Colors.blue,
-                                  size: 30,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.person,
-                                    color: Colors.blue,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
 
-                                  Expanded(
-                                    child: IgnorePointer(
-                                      ignoring: !authorchangeable,
-                                      child: DropdownButton<String>(
-                                        value: selectedAuthor,
-                                        isExpanded: true,
-                                        underline:
-                                            const SizedBox(), // removes default underline
-                                        items: [
-                                          ...library.authorNames.map(
-                                            (name) => DropdownMenuItem(
-                                              value: name,
-                                              child: Text(name),
-                                            ),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: addnew,
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: const [
-                                                Icon(
-                                                  Icons.person_add,
-                                                  size: 20,
-                                                  color: Colors.blue,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text('Add new author...'),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                        onChanged: (value) {
-                                          setState(() {
-                                            if (value == addnew) {
-                                              _callAddAuthorDialog(context);
-                                            } else {
-                                              setState(() {
-                                                selectedAuthor = value!;
-                                              });
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(2),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  AnimatedScale(
-                                    scale: showdecrement ? 1.0 : 0,
-                                    duration: Duration(milliseconds: 200),
-                                    child: IconButton(
-                                      onPressed: _decrement,
-                                      icon: Icon(
-                                        Icons.remove_circle,
-                                        color: Colors.red,
-                                      ),
-                                      iconSize: 40,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                  ContainerTitle(title: quantity.toString()),
-                                  IconButton(
-                                    onPressed: _increment,
-                                    icon: Icon(
-                                      Icons.add_circle,
-                                      color: Colors.blue,
-                                    ),
-                                    iconSize: 40,
-                                    color: Colors.blue,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: () => {Navigator.pop(context)},
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.red,
-                            size: 50,
-                          ),
-                          tooltip: 'Cancel',
-                        ),
-                        SizedBox(width: 40),
-                        AnimatedScale(
-                          scale:
-                              _booknamecontroller.text.trim().isNotEmpty &&
-                                  selectedAuthor.isNotEmpty
-                              ? 1.0
-                              : 0.0,
-                          duration: const Duration(milliseconds: 150),
-                          child: IconButton(
-                            onPressed: () => _saveBook(context),
-                            icon: const Icon(
-                              Icons.check,
-                              color: Colors.green,
-                              size: 50,
-                            ),
-                            tooltip: 'Save',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+    return FormScaffold(
+      icon: Icons.library_books_rounded,
+      title: 'Add book',
+      subtitle: 'Add a new title to your library collection.',
+      saveLabel: 'Add',
+      saveEnabled:
+          _booknamecontroller.text.trim().isNotEmpty &&
+          selectedAuthor.isNotEmpty,
+      onCancel: () => Navigator.pop(context),
+      onSave: () => _saveBook(context),
+
+      children: [
+        TextField(
+          controller: _booknamecontroller,
+          decoration: appInputDecoration(
+            context: context,
+            label: 'Book title',
+            icon: Icons.book_outlined,
+          ),
         ),
-      ),
+
+        const SizedBox(height: 16),
+
+        DropdownButtonFormField<String>(
+          initialValue: selectedAuthor,
+          decoration: appInputDecoration(
+            context: context,
+            label: 'Author',
+            icon: Icons.person_outline,
+          ),
+          items: library.authorNames.map((author) {
+            return DropdownMenuItem(value: author, child: Text(author));
+          }).toList(),
+          onChanged: authorchangeable
+              ? (value) {
+                  setState(() {
+                    selectedAuthor = value!;
+                  });
+                }
+              : null,
+        ),
+
+        // spacing
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: () => _callAddAuthorDialog(context),
+            icon: const Icon(Icons.person_add_alt_1),
+            label: const Text('Add new author'),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        QuantityStepper(
+          value: quantity,
+          canDecrement: quantity > 1,
+          onIncrement: _increment,
+          onDecrement: _decrement,
+        ),
+      ],
     );
   }
 

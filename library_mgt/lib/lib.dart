@@ -311,27 +311,6 @@ class Library extends ChangeNotifier {
     StatItem(id: 3, value: 0, tag: 'Users'),
     StatItem(id: 4, value: 0, tag: 'Rented'),
   ];
-  void setStat(int id) {
-    final statitem = stats.firstWhere((s) => s.id == id);
-    statitem.value = books.length;
-    switch (statitem.id) {
-      case 1:
-        statitem.value = books.length;
-        break;
-      case 2:
-        statitem.value = authors.length;
-        break;
-      case 3:
-        statitem.value = users.length;
-        break;
-      case 4:
-        statitem.value = rentals.fold(
-          0,
-          (total, rental) => total + rental.quantity,
-        );
-      default:
-    }
-  }
 
   int get totalBooks => _books.length;
   int get totalAuthors => _authors.length;

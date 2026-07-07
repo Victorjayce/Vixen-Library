@@ -100,6 +100,7 @@ class _RentedPageState extends State<RentedPage>
                     final rental = rentals[index];
                     final book = library.getbook(rental.bookid);
                     final user = library.getuser(rental.userid);
+                    final author = library.getauthor(book.author);
                     return Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -150,7 +151,7 @@ class _RentedPageState extends State<RentedPage>
                                   runSpacing: 4,
                                   children: [
                                     Text(
-                                      'by ${book.author}',
+                                      'by ${author.name}',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,

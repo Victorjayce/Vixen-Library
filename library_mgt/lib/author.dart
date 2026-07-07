@@ -156,6 +156,9 @@ class _AuthorPageState extends State<AuthorPage> {
               itemCount: library.authors.length,
               itemBuilder: (context, index) {
                 final author = library.authors[index];
+                final books = library.books
+                    .where((a) => a.author == author.id)
+                    .length;
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -217,7 +220,7 @@ class _AuthorPageState extends State<AuthorPage> {
                               const SizedBox(height: 4),
                               Text(
                                 author.booksId.isNotEmpty
-                                    ? '${author.booksId.length.toString()} Books Published'
+                                    ? '${books.toString()} Books Published'
                                     : 'No Books Published',
                                 style: TextStyle(
                                   fontSize: 14,

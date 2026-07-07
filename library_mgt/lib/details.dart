@@ -6,12 +6,7 @@ import 'widgets/addbook.dart';
 import 'widgets/addauthor.dart';
 
 class AuthorDetailPage extends StatefulWidget {
-  const AuthorDetailPage({
-    super.key,
-    required this.booksId,
-    required this.authorId,
-  });
-  final List<int> booksId;
+  const AuthorDetailPage({super.key, required this.authorId});
   final int authorId;
 
   @override
@@ -34,7 +29,7 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
     final author = library.getauthor(widget.authorId);
-    final List<Book> authorbooks = library.authorBooks(widget.booksId);
+    final authorbooks = library.books.where((a) => a.author == author.id);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
@@ -216,7 +211,7 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
               ),
             ),
             Expanded(
-              child: widget.booksId.isEmpty
+              child: authorbooks.isEmpty
                   ? const Center(
                       child: Text(
                         'No books Published yet.',

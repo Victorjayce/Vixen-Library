@@ -157,6 +157,9 @@ class _UserPageState extends State<UserPage> {
               itemCount: library.users.length,
               itemBuilder: (context, index) {
                 final user = library.users[index];
+                final rent = library.rentals
+                    .where((a) => a.userid == user.id)
+                    .length;
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -215,7 +218,7 @@ class _UserPageState extends State<UserPage> {
                               const SizedBox(height: 4),
                               Text(
                                 user.rentId.isNotEmpty
-                                    ? '${user.rentId.length.toString()} Books Rented'
+                                    ? '${rent.toString()} Books Rented'
                                     : 'No Books Rented',
                                 style: TextStyle(
                                   fontSize: 14,

@@ -284,20 +284,10 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
                                       runSpacing: 4,
                                       children: [
                                         Text(
-                                          'by ${book.author}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                          ),
-                                        ),
-                                        Text(
                                           '${book.available} pieces',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.bold,
                                             color: Theme.of(
                                               context,
                                             ).colorScheme.onSurface,

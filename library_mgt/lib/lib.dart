@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Book {
   final int id;
   final String title;
-  final String author;
+  final int author;
   int available;
   int rented = 0;
 
@@ -28,14 +28,6 @@ class ActivityItem {
     required this.timestamp,
     required this.activityenum,
   });
-}
-
-class StatItem {
-  final int id;
-  int value;
-  final String tag;
-
-  StatItem({required this.id, required this.value, required this.tag});
 }
 
 enum ActivityEnum {
@@ -305,12 +297,6 @@ class Library extends ChangeNotifier {
       activityenum: ActivityEnum.userRegistered,
     ),
   ];
-  final List<StatItem> stats = [
-    StatItem(id: 1, value: 0, tag: 'Books'),
-    StatItem(id: 2, value: 0, tag: 'Authors'),
-    StatItem(id: 3, value: 0, tag: 'Users'),
-    StatItem(id: 4, value: 0, tag: 'Rented'),
-  ];
 
   int get totalBooks => _books.length;
   int get totalAuthors => _authors.length;
@@ -330,7 +316,6 @@ class Library extends ChangeNotifier {
   List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
   List<ActivityItem> get recentActivities =>
       List.unmodifiable(activities.reversed.toList());
-  List<StatItem> get statsList => List.unmodifiable(stats);
 
   void addActivity(
     ActivityEnum activityEnum,
@@ -348,7 +333,7 @@ class Library extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool addBook(String title, String author, int quantity) {
+  bool addBook(String title, int author, int quantity) {
     if (_books.any((b) => b.title.toLowerCase() == title.toLowerCase())) {
       return false;
     }
@@ -360,7 +345,7 @@ class Library extends ChangeNotifier {
     );
 
     final abook = _authors.firstWhere(
-      (a) => a.name.toLowerCase() == author.toLowerCase(),
+      (a) => a.id == author,
       orElse: () => throw StateError('Author not found'),
     );
 

@@ -19,7 +19,8 @@ extension Statype on int {
     }
   }
 
-  int value(Library library) {
+  int value(BuildContext context) {
+    final library = LibraryProvider.of(context);
     switch (this) {
       case 1:
         return library.totalBooks;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'lib.dart';
 import 'extensions/datetimextension.dart';
 import 'extensions/statype.dart';
-import 'extensions/activitytype.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({super.key});
@@ -20,7 +19,7 @@ class _DashBoardState extends State<DashBoard>
   Widget build(BuildContext context) {
     super.build(context);
     final scheme = Theme.of(context).colorScheme;
-    List<int> statList = [1, 2, 3, 4];
+    List<int> statList = [1, 2, 3, 4, 5];
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -111,7 +110,7 @@ class _DashBoardState extends State<DashBoard>
                     (stat) => _StatCard(
                       icon: stat.icon,
                       label: stat.title,
-                      value: stat.value(LibraryProvider.of(context)),
+                      value: '${stat.value(context)}',
                       color: stat.color,
                     ),
                   )

@@ -14,7 +14,7 @@ class DbService {
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''
-CREATE TABLE User(
+CREATE TABLE Users(
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL
 );
@@ -33,7 +33,7 @@ CREATE TABLE Books(
   author INTEGER NOT NULL,
   available INTEGER NOT NULL,
   rented INTEGER NOT NULL DEFAULT 0,
-  FOREIGN KEY(author) REFERENCES Author(id)
+  FOREIGN KEY(author) REFERENCES Authors(id)
 );
 ''');
 

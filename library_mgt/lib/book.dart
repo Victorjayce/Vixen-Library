@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage>
                                         ),
                                       },
                                       child: Text(
-                                        'by ${book.author}',
+                                        'by ${author.name}',
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,

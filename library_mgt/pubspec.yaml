@@ -95,3 +95,17 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/vixenlib.png"
+  min_sdk_android: 21
+
+flutter_native_splash:
+
+  color: "#0F172A"
+  image: assets/vixenlib.png
+
+  android: true
+  ios: false

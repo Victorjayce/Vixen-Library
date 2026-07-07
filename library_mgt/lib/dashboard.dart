@@ -36,6 +36,7 @@ class _DashBoardState extends State<DashBoard>
     return RefreshIndicator(
       onRefresh: () async {
         await Future<void>.delayed(const Duration(milliseconds: 600));
+        await library.loadData();
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

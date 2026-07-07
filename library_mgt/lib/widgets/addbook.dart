@@ -165,9 +165,12 @@ class _AddbookState extends State<Addbook> {
   }
 
   void _saveBook(BuildContext context) {
+    final authorId = library.authors
+        .firstWhere((a) => a.name == selectedAuthor)
+        .id;
     final bookName = _booknamecontroller.text.trim();
     if (bookName.isNotEmpty && selectedAuthor.isNotEmpty) {
-      LibraryProvider.of(context).addBook(bookName, selectedAuthor, quantity);
+      LibraryProvider.of(context).addBook(bookName, authorId, quantity);
       Navigator.pop(context, bookName);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

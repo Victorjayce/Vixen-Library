@@ -230,65 +230,6 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-        endDrawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              const ContainerTitle(title: 'Menu'),
-              ListTile(
-                leading: const Icon(Icons.bookmark_add),
-                title: const Text(
-                  'Rent Books',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.normal,
-                    fontFamily: 'Roboto',
-                    letterSpacing: 0.5,
-                    color: Colors.blue,
-                  ),
-                ),
-                iconColor: Colors.blue,
-                onTap: null,
-              ),
-              ListTile(
-                leading: const Icon(Icons.bookmark_added),
-                title: const Text(
-                  'Rented Books',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.normal,
-                    fontFamily: 'Roboto',
-                    letterSpacing: 0.5,
-                    color: Colors.blue,
-                  ),
-                ),
-                iconColor: Colors.blue,
-                onTap: () {
-                  Navigator.pushNamed(context, '/rentedscreen');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text(
-                  'Authors',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.normal,
-                    fontFamily: 'Roboto',
-                    letterSpacing: 0.5,
-                    color: Colors.blue,
-                  ),
-                ),
-                iconColor: Colors.blue,
-                onTap: () {
-                  Navigator.pushNamed(context, '/authorscreen');
-                },
-              ),
-            ],
-          ),
-        ),
         body: PageView(
           controller: pageController,
           onPageChanged: (index) {

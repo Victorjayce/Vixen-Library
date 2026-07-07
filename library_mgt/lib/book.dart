@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage>
                     final book = library.books[index];
                     final author = LibraryProvider.of(
                       context,
-                    ).authors.firstWhere((a) => a.name == book.author);
+                    ).authors.firstWhere((a) => a.id == book.author);
                     return Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16,

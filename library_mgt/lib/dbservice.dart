@@ -3,8 +3,8 @@ import 'package:path/path.dart';
 import 'lib.dart';
 
 class DbService {
-  static final DbService instance = DbService._constructor();
   DbService._constructor();
+  static final DbService instance = DbService._constructor();
 
   Future<Database> initDb() async {
     final dbDirPath = await getDatabasesPath();
@@ -17,14 +17,14 @@ class DbService {
 CREATE TABLE User(
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL
-)
+);
 ''');
 
         await db.execute('''
 CREATE TABLE Authors(
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL
-)
+);
 ''');
         await db.execute('''
 CREATE TABLE Books(
@@ -32,9 +32,9 @@ CREATE TABLE Books(
   title TEXT NOT NULL,
   author INTEGER NOT NULL,
   available INTEGER NOT NULL,
-  rented INTEGER NOT NULL DEFAULT 0
+  rented INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(author) REFERENCES Author(id)
-)
+);
 ''');
 
         await db.execute('''
@@ -45,7 +45,7 @@ CREATE TABLE Rentals(
   quantity INTEGER NOT NULL,
   FOREIGN KEY(bookId) REFERENCES Books(id),
   FOREIGN KEY(userId) REFERENCES Users(id)
-)
+);
 ''');
 
         await db.execute('''
@@ -55,7 +55,7 @@ CREATE TABLE Activities(
   subtitle TEXT NOT NULL,
   timestamp TEXT NOT NULL,
   activityEnum INTEGER NOT NULL
-)
+);
 ''');
       },
     );

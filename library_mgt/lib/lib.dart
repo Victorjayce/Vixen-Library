@@ -163,6 +163,7 @@ class Library extends ChangeNotifier {
       activityenum: activityEnum,
     );
     _activities.add(activity);
+    db.addActivity(activity);
     notifyListeners();
   }
 
@@ -190,6 +191,7 @@ class Library extends ChangeNotifier {
       title,
       '$quantity pcs was added to library',
     );
+    db.addBook(newBook);
     notifyListeners();
     return true;
   }
@@ -207,6 +209,7 @@ class Library extends ChangeNotifier {
       name,
       'joined the library',
     );
+    db.addUser(newUser);
     notifyListeners();
     return true;
   }
@@ -224,6 +227,7 @@ class Library extends ChangeNotifier {
       newname,
       'Changed from $oldname',
     );
+    db.updateUser(user);
     notifyListeners();
     return true;
   }
@@ -241,6 +245,7 @@ class Library extends ChangeNotifier {
       book.title,
       '$quantity pieces added',
     );
+    db.updateBook(book);
     notifyListeners();
   }
 
@@ -280,6 +285,7 @@ class Library extends ChangeNotifier {
         book.title,
         'by ${user.name}',
       );
+      db.addRental(newrental, book);
       notifyListeners();
     }
   }
@@ -303,6 +309,7 @@ class Library extends ChangeNotifier {
         book.title,
         'by ${user.name}',
       );
+      db.deleteRental(rental, book);
       notifyListeners();
     }
   }
@@ -323,21 +330,10 @@ class Library extends ChangeNotifier {
       name,
       'Author logged to library',
     );
+    db.addAuthor(newAuthor);
     notifyListeners();
     return true;
   }
-
-  // bool updateAuthor(int id, String newname) {
-  //   if (_authors.any((a) => a.name.toLowerCase() == newname.toLowerCase())) {
-  //     return false;
-  //   }
-  //   final author = _authors.firstWhere((a) => a.id == id);
-  //   String oldname = author.name;
-  //   author.name = newname;
-  //   addActivity(ActivityEnum.authorEdited, DateTime.now(), author.name, 'from $oldname');
-  //   notifyListeners();
-  //   return true;
-  // }
 
   bool editAuthor(String oldname, int id, String newname) {
     if (!_authors.any((a) => a.name == oldname) ||
@@ -353,6 +349,7 @@ class Library extends ChangeNotifier {
       'from $oldname',
     );
     notifyListeners();
+    db.updateAuthor(author);
     return true;
   }
 
@@ -369,6 +366,7 @@ class Library extends ChangeNotifier {
       user.name,
       'from $oldname',
     );
+    db.updateUser(user);
     notifyListeners();
     return true;
   }
@@ -384,6 +382,7 @@ class Library extends ChangeNotifier {
       'Deleted from library logs',
     );
     notifyListeners();
+    db.deleteAuthor(author.id);
     return true;
   }
 
@@ -398,6 +397,7 @@ class Library extends ChangeNotifier {
       'left the library',
     );
     notifyListeners();
+    db.deleteUser(user.id);
     return true;
   }
 
@@ -411,6 +411,7 @@ class Library extends ChangeNotifier {
       'was deleted from the library',
     );
     notifyListeners();
+    db.deleteBook(book.id);
   }
 
   Author getauthor(int id) {

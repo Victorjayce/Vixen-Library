@@ -5,6 +5,7 @@ import 'package:library_mgt/lib.dart';
 import 'package:library_mgt/home.dart';
 import 'package:library_mgt/user.dart';
 import 'package:library_mgt/udetails.dart';
+import 'dbservice.dart';
 
 const homeRoute = '/';
 const authorRoute = '/authorscreen';
@@ -13,6 +14,7 @@ const detailsRoute = '/detailscreen';
 const userdetailsRoute = '/userdetailscreen';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DbService.instance.database;
   await library.loadData();
   runApp(const MyApp());
 }

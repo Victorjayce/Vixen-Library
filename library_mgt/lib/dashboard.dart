@@ -14,6 +14,18 @@ class _DashBoardState extends State<DashBoard>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+  final scrollcontroller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    scrollcontroller.addListener(() {
+      if (scrollcontroller.position.pixels >
+          scrollcontroller.position.maxScrollExtent - 200) {
+        library.loadMoreActivites();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

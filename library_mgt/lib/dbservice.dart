@@ -2,9 +2,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'lib.dart';
 
-class Dbservice {
-  static final Dbservice instance = Dbservice._constructor();
-  Dbservice._constructor();
+class DbService {
+  static final DbService instance = DbService._constructor();
+  DbService._constructor();
 
   Future<Database> initDb() async {
     final dbDirPath = await getDatabasesPath();
@@ -254,9 +254,17 @@ CREATE TABLE Activities(
     return rentals;
   }
 
-  Future<List<ActivityItem>> loadActivity() async {
+  Future<List<ActivityItem>> loadActivity({
+    int limit = 50,
+    int offset = 0,
+  }) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('Activities');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'Activities',
+      orderBy: 'timestamp DESC',
+      limit: limit,
+      offset: offset,
+    );
 
     final activities = maps
         .map(

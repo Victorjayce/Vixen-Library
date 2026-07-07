@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dbservice.dart';
 
 class Book {
   final int id;
@@ -92,211 +93,44 @@ class UserDetailsArgs {
 }
 
 class Library extends ChangeNotifier {
-  final List<Book> _books = [
-    Book(
-      id: 1,
-      title: 'The Hobbit',
-      author: 'J.R.R. Tolkien',
-      available: 5,
-      rented: 3,
-    ),
-    Book(
-      id: 2,
-      title: '1984',
-      author: 'George Orwell',
-      available: 5,
-      rented: 3,
-    ),
-    Book(
-      id: 3,
-      title: 'Dune',
-      author: 'Frank Herbert',
-      available: 5,
-      rented: 3,
-    ),
-    Book(id: 4, title: 'Subtle Art', author: 'Victor Jayc3', available: 5),
-    Book(id: 5, title: 'Crucial Convo', author: 'Victor Jayc3', available: 5),
-    Book(
-      id: 6,
-      title: 'The Hobbit2',
-      author: 'J.R.R. Tolkien',
-      available: 5,
-      rented: 3,
-    ),
-    Book(id: 7, title: '1985', author: 'George Orwell', available: 5),
-    Book(
-      id: 8,
-      title: 'Shadow Master',
-      author: 'Guity Three',
-      available: 20,
-      rented: 2,
-    ),
-    Book(
-      id: 9,
-      title: 'Shadow Slave',
-      author: 'Guity Three',
-      available: 20,
-      rented: 1,
-    ),
-    Book(
-      id: 10,
-      title: 'Sunless',
-      author: 'Guity Three',
-      available: 20,
-      rented: 3,
-    ),
-    Book(
-      id: 11,
-      title: 'Flaming Sun',
-      author: 'Guity Three',
-      available: 20,
-      rented: 90,
-    ),
-    Book(
-      id: 12,
-      title: 'Wraiths',
-      author: 'Guity Three',
-      available: 20,
-      rented: 90,
-    ),
-    Book(
-      id: 13,
-      title: 'LOTM',
-      author: 'Cuttlefish',
-      available: 39,
-      rented: 34,
-    ),
-    Book(
-      id: 14,
-      title: 'Kill the Sun',
-      author: 'Prince Esper',
-      available: 29,
-      rented: 4,
-    ),
-    Book(
-      id: 15,
-      title: 'Mother of Learning',
-      author: 'Novada Rain',
-      available: 79,
-      rented: 23,
-    ),
-    Book(
-      id: 16,
-      title: 'Young Master',
-      author: 'Master Yeung',
-      available: 28,
-      rented: 5,
-    ),
-    Book(
-      id: 17,
-      title: 'City of Gold',
-      author: 'Guity Three',
-      available: 20,
-      rented: 90,
-    ),
-    Book(id: 18, title: 'COI', author: 'Cuttlefish', available: 39, rented: 5),
-    Book(
-      id: 19,
-      title: 'Nick the Specter',
-      author: 'Prince Esper',
-      available: 29,
-      rented: 2,
-    ),
-    Book(
-      id: 20,
-      title: 'Home Magus',
-      author: 'Novada Rain',
-      available: 79,
-      rented: 3,
-    ),
-    Book(
-      id: 21,
-      title: 'Young Master\'s POV',
-      author: 'Master Yeung',
-      available: 28,
-      rented: 5,
-    ),
-    Book(
-      id: 22,
-      title: 'Great Old Ones',
-      author: 'Cuttlefish',
-      available: 39,
-      rented: 34,
-    ),
-    Book(
-      id: 23,
-      title: 'The Fool',
-      author: 'Cuttlefish',
-      available: 39,
-      rented: 34,
-    ),
-    Book(
-      id: 24,
-      title: 'Gehrman the Sparrow',
-      author: 'Cuttlefish',
-      available: 39,
-      rented: 34,
-    ),
-    Book(
-      id: 25,
-      title: 'The Outer Lords',
-      author: 'Prince Esper',
-      available: 29,
-      rented: 1,
-    ),
-  ];
+  final db = DbService.instance;
+  late List<Book> _books;
 
-  final List<Author> _authors = [
-    Author(id: 1, name: 'J.R.R. Tolkien', booksId: [1, 6]),
-    Author(id: 2, name: 'George Orwell', booksId: [2, 7]),
-    Author(id: 3, name: 'Victor Jayc3', booksId: [4, 5]),
-    Author(id: 4, name: 'Frank Herbert', booksId: [3]),
-    Author(id: 5, name: 'Guilty Three', booksId: [8, 9, 10, 11, 12, 17]),
-    Author(id: 6, name: 'Cuttlefish', booksId: [13, 18, 22, 23, 24]),
-    Author(id: 7, name: 'Prince Esper', booksId: [14, 19, 25]),
-    Author(id: 8, name: 'Novada Rain', booksId: [15, 20]),
-    Author(id: 9, name: 'Master Yeung', booksId: [16, 21]),
-    Author(id: 10, name: 'Harry Simpson', booksId: []),
-  ];
+  late List<Author> _authors;
 
-  final List<User> _users = [
-    User(id: 1, name: 'Victor Mart', rentId: [1, 2, 3]),
-    User(id: 2, name: 'Jerry Miah', rentId: [9, 7, 8]),
-    User(id: 3, name: 'Merl Ancah', rentId: [4, 5, 6]),
-  ];
+  late List<User> _users;
 
-  final List<Rental> _rented = [
-    Rental(id: 1, bookid: 20, userid: 1, quantity: 3),
-    Rental(id: 2, bookid: 7, userid: 1, quantity: 1),
-    Rental(id: 3, bookid: 14, userid: 1, quantity: 4),
-    Rental(id: 4, bookid: 18, userid: 3, quantity: 5),
-    Rental(id: 5, bookid: 19, userid: 3, quantity: 2),
-    Rental(id: 6, bookid: 25, userid: 3, quantity: 1),
-    Rental(id: 7, bookid: 8, userid: 2, quantity: 2),
-    Rental(id: 8, bookid: 9, userid: 2, quantity: 1),
-    Rental(id: 9, bookid: 10, userid: 2, quantity: 3),
-  ];
+  late List<Rental> _rented;
 
-  final List<ActivityItem> activities = [
-    ActivityItem(
-      name: 'The Hobbit',
-      subtitle: ' • 20 pcs was added to library',
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      activityenum: ActivityEnum.newBook,
-    ),
-    ActivityItem(
-      name: 'Atomic Habits',
-      subtitle: ' • by Victor Mart',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      activityenum: ActivityEnum.bookRented,
-    ),
-    ActivityItem(
-      name: 'Amina',
-      subtitle: ' • joined the library',
-      timestamp: DateTime.now(),
-      activityenum: ActivityEnum.userRegistered,
-    ),
-  ];
+  late List<ActivityItem> _activities;
+
+  Future<void> loadData() async {
+    _books = await db.loadBook();
+    _activities = await db.loadActivity();
+    _authors = await db.loadAuthor();
+    _rented = await db.loadRental();
+    _users = await db.loadUser();
+  }
+
+  bool isLoading = false;
+  bool hasMore = true;
+  Future<void> loadMoreActivites() async {
+    if (isLoading || !hasMore) {
+      return;
+    }
+    isLoading = true;
+    final more = await db.loadActivity(
+      limit: 50,
+      offset: recentActivities.length,
+    );
+    if (more.isEmpty) {
+      hasMore = false;
+    } else {
+      _activities.addAll(more);
+    }
+    isLoading = false;
+    notifyListeners();
+  }
 
   int get totalBooks => _books.length;
   int get totalAuthors => _authors.length;
@@ -314,8 +148,7 @@ class Library extends ChangeNotifier {
   List<String> get bookNames => _books.map((book) => book.title).toList();
   List<String> get userNames => _users.map((u) => u.name).toList();
   List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
-  List<ActivityItem> get recentActivities =>
-      List.unmodifiable(activities.reversed.toList());
+  List<ActivityItem> get recentActivities => List.unmodifiable(_activities);
 
   void addActivity(
     ActivityEnum activityEnum,
@@ -329,7 +162,7 @@ class Library extends ChangeNotifier {
       timestamp: timestamp,
       activityenum: activityEnum,
     );
-    activities.add(activity);
+    _activities.add(activity);
     notifyListeners();
   }
 

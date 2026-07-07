@@ -11,7 +11,9 @@ const authorRoute = '/authorscreen';
 const userRoute = '/userscreen';
 const detailsRoute = '/detailscreen';
 const userdetailsRoute = '/userdetailscreen';
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await library.loadData();
   runApp(const MyApp());
 }
 

@@ -156,9 +156,9 @@ class _AuthorPageState extends State<AuthorPage> {
               itemCount: library.authors.length,
               itemBuilder: (context, index) {
                 final author = library.authors[index];
-                final books = library.books
-                    .where((a) => a.author == author.id)
-                    .length;
+                final authorbooks = library.books.where(
+                  (a) => a.author == author.id,
+                );
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -179,10 +179,7 @@ class _AuthorPageState extends State<AuthorPage> {
                       Navigator.pushNamed(
                         context,
                         '/detailscreen',
-                        arguments: AuthorDetailArgs(
-                          booksId: author.booksId,
-                          authorId: author.id,
-                        ),
+                        arguments: AuthorDetailArgs(authorId: author.id),
                       );
                     },
                     borderRadius: BorderRadius.circular(16),
@@ -219,8 +216,8 @@ class _AuthorPageState extends State<AuthorPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                author.booksId.isNotEmpty
-                                    ? '${books.toString()} Books Published'
+                                authorbooks.isNotEmpty
+                                    ? '${authorbooks.length.toString()} Books Published'
                                     : 'No Books Published',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -238,7 +235,7 @@ class _AuthorPageState extends State<AuthorPage> {
                             final delete = await showDialog<bool>(
                               context: context,
                               builder: (context) {
-                                if (author.booksId.isNotEmpty) {
+                                if (authorbooks.isNotEmpty) {
                                   return AlertDialog(
                                     icon: const Icon(
                                       Icons.error,

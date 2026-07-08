@@ -157,9 +157,9 @@ class _UserPageState extends State<UserPage> {
               itemCount: library.users.length,
               itemBuilder: (context, index) {
                 final user = library.users[index];
-                final rent = library.rentals
-                    .where((a) => a.userid == user.id)
-                    .length;
+                final userentals = library.rentals.where(
+                  (a) => a.userid == user.id,
+                );
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -217,8 +217,8 @@ class _UserPageState extends State<UserPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                user.rentId.isNotEmpty
-                                    ? '${rent.toString()} Books Rented'
+                                userentals.isNotEmpty
+                                    ? '${userentals.length.toString()} Books Rented'
                                     : 'No Books Rented',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -236,7 +236,7 @@ class _UserPageState extends State<UserPage> {
                             final delete = await showDialog<bool>(
                               context: context,
                               builder: (context) {
-                                if (user.rentId.isNotEmpty) {
+                                if (userentals.isNotEmpty) {
                                   return AlertDialog(
                                     icon: const Icon(
                                       Icons.error,

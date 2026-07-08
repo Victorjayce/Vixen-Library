@@ -84,8 +84,7 @@ Route<dynamic>? _routes(RouteSettings settings) {
       final args = settings.arguments;
       if (args is AuthorDetailArgs) {
         return MaterialPageRoute(
-          builder: (_) =>
-              AuthorDetailPage(booksId: args.booksId, authorId: args.authorId),
+          builder: (_) => AuthorDetailPage(authorId: args.authorId),
         );
       }
       return _errorRoute();

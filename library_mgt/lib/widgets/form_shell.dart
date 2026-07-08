@@ -10,14 +10,18 @@ Future<T?> showAppBottomSheet<T>({
     useSafeArea: true,
     backgroundColor: Colors.transparent,
     clipBehavior: Clip.antiAlias,
-    builder: (context) => _SheetFrame(child: child),
+    builder: (context) {
+      return SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
+        child: _SheetFrame(child: child),
+      );
+    },
   );
 }
 
-Widget appDialog({
-  required BuildContext context,
-  required Widget child,
-}) {
+Widget appDialog({required BuildContext context, required Widget child}) {
   return Dialog(
     insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
     backgroundColor: Colors.transparent,
@@ -249,9 +253,9 @@ class QuantityStepper extends StatelessWidget {
             child: Text(
               '$value',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: scheme.primary,
-                  ),
+                fontWeight: FontWeight.w800,
+                color: scheme.primary,
+              ),
             ),
           ),
           IconButton(

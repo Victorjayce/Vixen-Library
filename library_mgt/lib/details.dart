@@ -29,7 +29,9 @@ class _AuthorDetailPageState extends State<AuthorDetailPage> {
   Widget build(BuildContext context) {
     final library = LibraryProvider.of(context);
     final author = library.getauthor(widget.authorId);
-    final authorbooks = library.books.where((a) => a.author == author.id);
+    final authorbooks = library.books
+        .where((a) => a.author == author.id)
+        .toList();
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(

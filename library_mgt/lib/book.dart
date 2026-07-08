@@ -169,7 +169,6 @@ class _HomePageState extends State<HomePage>
                                           context,
                                           '/detailscreen',
                                           arguments: AuthorDetailArgs(
-                                            booksId: author.booksId,
                                             authorId: author.id,
                                           ),
                                         ),

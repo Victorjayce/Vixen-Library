@@ -210,13 +210,7 @@ CREATE TABLE Activities(
     final List<Map<String, dynamic>> maps = await db.query('Authors');
 
     final authors = maps
-        .map(
-          (e) => Author(
-            id: e['id'],
-            name: e['name'],
-            booksId: [], // Populate separately if needed
-          ),
-        )
+        .map((e) => Author(id: e['id'], name: e['name']))
         .toList();
     return authors;
   }
@@ -225,15 +219,7 @@ CREATE TABLE Activities(
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('Users');
 
-    final users = maps
-        .map(
-          (e) => User(
-            id: e['id'],
-            name: e['name'],
-            rentId: [], // Populate separately if needed
-          ),
-        )
-        .toList();
+    final users = maps.map((e) => User(id: e['id'], name: e['name'])).toList();
     return users;
   }
 

@@ -14,9 +14,9 @@ class UserDetail extends StatefulWidget {
 class _UserDetailState extends State<UserDetail> {
   @override
   Widget build(BuildContext context) {
-    final userRentals = LibraryProvider.of(
-      context,
-    ).userRentals(widget.user.rentId);
+    final userRentals = library.rentals
+        .where((a) => a.userid == widget.user.id)
+        .toList();
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
@@ -171,9 +171,9 @@ class _UserDetailState extends State<UserDetail> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  widget.user.rentId.length == 1
-                                      ? '${widget.user.rentId.length} book rented'
-                                      : '${widget.user.rentId.length} books rented',
+                                  userRentals.length == 1
+                                      ? '${userRentals.length} book rented'
+                                      : '${userRentals.length} books rented',
                                   style: TextStyle(
                                     color: scheme.onPrimary,
                                     fontWeight: FontWeight.w600,

@@ -52,16 +52,15 @@ enum ActivityEnum {
 class User {
   final int id;
   String name;
-  final List<int> rentId;
 
-  User({required this.id, required this.name, required this.rentId});
+  User({required this.id, required this.name});
 }
 
 class Rental {
   final int id;
   final int bookid;
   final int userid;
-  final int quantity;
+  int quantity;
 
   Rental({
     required this.id,
@@ -74,16 +73,14 @@ class Rental {
 class Author {
   final int id;
   String name;
-  final List<int> booksId;
 
-  Author({required this.id, required this.name, required this.booksId});
+  Author({required this.id, required this.name});
 }
 
 class AuthorDetailArgs {
-  final List<int> booksId;
   final int authorId;
 
-  AuthorDetailArgs({required this.booksId, required this.authorId});
+  AuthorDetailArgs({required this.authorId});
 }
 
 class UserDetailsArgs {
@@ -177,13 +174,6 @@ class Library extends ChangeNotifier {
       author: author,
       available: quantity,
     );
-
-    final abook = _authors.firstWhere(
-      (a) => a.id == author,
-      orElse: () => throw StateError('Author not found'),
-    );
-
-    abook.booksId.add(newBook.id);
     _books.add(newBook);
     addActivity(
       ActivityEnum.newBook,
@@ -201,7 +191,7 @@ class Library extends ChangeNotifier {
       return false;
     }
 
-    final newUser = User(id: _users.length + 1, name: name, rentId: []);
+    final newUser = User(id: _users.length + 1, name: name);
     _users.add(newUser);
     addActivity(
       ActivityEnum.userRegistered,
@@ -253,10 +243,6 @@ class Library extends ChangeNotifier {
     return _books.where((book) => ids.contains(book.id)).toList();
   }
 
-  List<Rental> userRentals(List<int> ids) {
-    return _rented.where((r) => ids.contains(r.id)).toList();
-  }
-
   void rentBook(int bookId, int amount, int userId) {
     if (_books.isEmpty) {
       return;
@@ -278,7 +264,6 @@ class Library extends ChangeNotifier {
         quantity: amount,
       );
       _rented.add(newrental);
-      user.rentId.add(newrental.id);
       addActivity(
         ActivityEnum.bookRented,
         DateTime.now(),
@@ -301,8 +286,11 @@ class Library extends ChangeNotifier {
     if (book.rented >= amount && rental.quantity >= amount) {
       book.rented -= amount;
       book.available += amount;
-      _rented.remove(rental);
-      user.rentId.remove(rentId);
+      if (amount == rental.quantity) {
+        _rented.remove(rental);
+      } else {
+        rental.quantity -= amount;
+      }
       addActivity(
         ActivityEnum.bookReturned,
         DateTime.now(),
@@ -314,15 +302,11 @@ class Library extends ChangeNotifier {
     }
   }
 
-  bool addAuthor(String name, List<int> booksId) {
+  bool addAuthor(String name) {
     if (_authors.any((a) => a.name.toLowerCase() == name.toLowerCase())) {
       return false;
     }
-    final newAuthor = Author(
-      id: _authors.length + 1,
-      name: name,
-      booksId: booksId,
-    );
+    final newAuthor = Author(id: _authors.length + 1, name: name);
     _authors.add(newAuthor);
     addActivity(
       ActivityEnum.authorAdded,
@@ -373,7 +357,8 @@ class Library extends ChangeNotifier {
 
   bool deleteAuthor(int id) {
     final author = _authors.firstWhere((a) => a.id == id);
-    if (author.booksId.isNotEmpty) return false;
+    final authorbooks = books.where((a) => a.author == author.id).toList();
+    if (authorbooks.isNotEmpty) return false;
     _authors.remove(author);
     addActivity(
       ActivityEnum.authorDeleted,
@@ -388,7 +373,8 @@ class Library extends ChangeNotifier {
 
   bool deleteUser(int id) {
     final user = _users.firstWhere((a) => a.id == id);
-    if (user.rentId.isNotEmpty) return false;
+    final userentals = rentals.where((a) => a.userid == user.id).toList();
+    if (userentals.isNotEmpty) return false;
     _users.remove(user);
     addActivity(
       ActivityEnum.userDeleted,

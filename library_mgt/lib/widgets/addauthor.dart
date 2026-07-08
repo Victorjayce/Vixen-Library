@@ -106,9 +106,7 @@ class _AddauthorState extends State<Addauthor> {
         return;
       }
     } else {
-      LibraryProvider.of(
-        context,
-      ).addAuthor(_authornamecontroller.text.trim(), []);
+      LibraryProvider.of(context).addAuthor(_authornamecontroller.text.trim());
     }
     Navigator.pop(context, _authornamecontroller.text.trim());
   }

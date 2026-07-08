@@ -177,6 +177,27 @@ CREATE TABLE Activities(
     });
   }
 
+  void returnRental(Rental rental, Book book) async {
+    final db = await database;
+    await db.transaction((tx) async {
+      await tx.update(
+        'Rentals',
+        {'quantity': rental.quantity},
+        where: 'id = ?',
+        whereArgs: [rental.id],
+      );
+      await tx.update(
+        'Books',
+        {
+          'available': book.available + rental.quantity,
+          'rented': book.rented - rental.quantity,
+        },
+        where: 'id = ?',
+        whereArgs: [book.id],
+      );
+    });
+  }
+
   void addActivity(ActivityItem activity) async {
     final db = await database;
     await db.insert('Activities', {

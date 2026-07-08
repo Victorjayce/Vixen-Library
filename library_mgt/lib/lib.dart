@@ -288,8 +288,10 @@ class Library extends ChangeNotifier {
       book.available += amount;
       if (amount == rental.quantity) {
         _rented.remove(rental);
+        db.deleteRental(rental, book);
       } else {
         rental.quantity -= amount;
+        db.returnRental(rental, book);
       }
       addActivity(
         ActivityEnum.bookReturned,
@@ -297,7 +299,6 @@ class Library extends ChangeNotifier {
         book.title,
         'by ${user.name}',
       );
-      db.deleteRental(rental, book);
       notifyListeners();
     }
   }

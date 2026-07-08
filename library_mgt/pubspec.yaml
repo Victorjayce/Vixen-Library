@@ -58,7 +58,7 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-  flutter_launcher_icons:
+flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/vixenlib.png"

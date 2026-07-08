@@ -19,7 +19,6 @@ class _RentedPageState extends State<RentedPage>
   Widget build(BuildContext context) {
     super.build(context);
     final library = LibraryProvider.of(context);
-    final rented = library.rented;
     final rentals = library.rentals;
     final scheme = Theme.of(context).colorScheme;
     return Column(
@@ -83,7 +82,7 @@ class _RentedPageState extends State<RentedPage>
           ),
         ),
         Expanded(
-          child: rented.isEmpty
+          child: rentals.isEmpty
               ? Center(
                   child: Text(
                     'No books available yet.',

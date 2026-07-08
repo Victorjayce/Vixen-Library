@@ -343,7 +343,8 @@ class _HomePageState extends State<HomePage>
   Future<void> _calladdbook(BuildContext context) async {
     String? bookName = await showAddBook(context);
     if (!context.mounted) return;
-    if (bookName != null && bookName.isNotEmpty) {
+    if (bookName == null) return;
+    if (bookName.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Book: \'$bookName\'      added to library'),
@@ -375,7 +376,7 @@ class _HomePageState extends State<HomePage>
   Future<void> _calladdmore(int id, BuildContext context) async {
     int? quantity = await showAddMore(context, id: id);
     if (!context.mounted) return;
-    if (quantity != 0 && quantity != null) {
+    if (quantity != 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: quantity == 1

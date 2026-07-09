@@ -145,7 +145,8 @@ class Library extends ChangeNotifier {
   List<String> get bookNames => _books.map((book) => book.title).toList();
   List<String> get userNames => _users.map((u) => u.name).toList();
   List<Book> get rented => List.unmodifiable(_books.where((b) => b.rented > 0));
-  List<ActivityItem> get recentActivities => List.unmodifiable(_activities);
+  List<ActivityItem> get recentActivities =>
+      List.unmodifiable(_activities.reversed);
 
   void addActivity(
     ActivityEnum activityEnum,

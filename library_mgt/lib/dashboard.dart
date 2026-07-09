@@ -39,6 +39,7 @@ class _DashBoardState extends State<DashBoard>
         await library.loadData();
       },
       child: SingleChildScrollView(
+        controller: scrollcontroller,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         child: Column(

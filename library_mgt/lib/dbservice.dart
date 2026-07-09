@@ -268,7 +268,6 @@ CREATE TABLE Activities(
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'Activities',
-      orderBy: 'timestamp DESC',
       limit: limit,
       offset: offset,
     );
